@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.linkage_construction &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.linkage_construction.compute_linkages" href="COSIE.linkage_construction.compute_linkages.html" />
+    <link rel="prev" title="COSIE.image_preprocessing.PatchDataset" href="COSIE.image_preprocessing.PatchDataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">COSIE.linkage_construction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.compute_linkages.html">COSIE.linkage_construction.compute_linkages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.compute_linkages_per_subgraph.html">COSIE.linkage_construction.compute_linkages_per_subgraph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.load_protein_gene_mapping.html">COSIE.linkage_construction.load_protein_gene_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.perform_strong_linkage_knn.html">COSIE.linkage_construction.perform_strong_linkage_knn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.perform_weak_linkage_knn.html">COSIE.linkage_construction.perform_weak_linkage_knn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.preprocess_data_for_subgraphs.html">COSIE.linkage_construction.preprocess_data_for_subgraphs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.split_into_subgraphs.html">COSIE.linkage_construction.split_into_subgraphs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.linkage_construction.split_raw_data.html">COSIE.linkage_construction.split_raw_data</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+      <li class="breadcrumb-item active">COSIE.linkage_construction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-COSIE.linkage_construction">
+<span id="cosie-linkage-construction"></span><h1>COSIE.linkage_construction<a class="headerlink" href="#module-COSIE.linkage_construction" title="Link to this heading">¶</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.linkage_construction.compute_linkages.html#COSIE.linkage_construction.compute_linkages" title="COSIE.linkage_construction.compute_linkages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_linkages</span></code></a></p></td>
+<td><p>Construct pairwise linkage triplets across specified tissue sections and modalities using symmetric nearest neighbor matching.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.linkage_construction.compute_linkages_per_subgraph.html#COSIE.linkage_construction.compute_linkages_per_subgraph" title="COSIE.linkage_construction.compute_linkages_per_subgraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_linkages_per_subgraph</span></code></a></p></td>
+<td><p>Compute triplet linkages between two spatial subgraphs, each from a different section.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.linkage_construction.load_protein_gene_mapping.html#COSIE.linkage_construction.load_protein_gene_mapping" title="COSIE.linkage_construction.load_protein_gene_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_protein_gene_mapping</span></code></a></p></td>
+<td><p>Load relationships between proteins and their associated genes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.linkage_construction.perform_strong_linkage_knn.html#COSIE.linkage_construction.perform_strong_linkage_knn" title="COSIE.linkage_construction.perform_strong_linkage_knn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_strong_linkage_knn</span></code></a></p></td>
+<td><p>Construct triplet pairs between two sections of the same modality using symmetric KNN-based linkage.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.linkage_construction.perform_weak_linkage_knn.html#COSIE.linkage_construction.perform_weak_linkage_knn" title="COSIE.linkage_construction.perform_weak_linkage_knn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_weak_linkage_knn</span></code></a></p></td>
+<td><p>Construct weak linkage triplet pairs between two datasets of different but biologically related modalities.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.linkage_construction.preprocess_data_for_subgraphs.html#COSIE.linkage_construction.preprocess_data_for_subgraphs" title="COSIE.linkage_construction.preprocess_data_for_subgraphs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocess_data_for_subgraphs</span></code></a></p></td>
+<td><p>Split each section into spatial subgraphs and compute cross-section triplet linkages at the subgraph level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.linkage_construction.split_into_subgraphs.html#COSIE.linkage_construction.split_into_subgraphs" title="COSIE.linkage_construction.split_into_subgraphs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_into_subgraphs</span></code></a></p></td>
+<td><p>Split a feature tensor and its corresponding spatial coordinates into <cite>n_x × n_y</cite> rectangular subregions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.linkage_construction.split_raw_data.html#COSIE.linkage_construction.split_raw_data" title="COSIE.linkage_construction.split_raw_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_raw_data</span></code></a></p></td>
+<td><p>Divide spatial omics data from each section into spatially partitioned subgraphs.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.image_preprocessing.PatchDataset.html" class="btn btn-neutral float-left" title="COSIE.image_preprocessing.PatchDataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.linkage_construction.compute_linkages.html" class="btn btn-neutral float-right" title="COSIE.linkage_construction.compute_linkages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

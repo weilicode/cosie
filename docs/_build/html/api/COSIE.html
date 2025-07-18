@@ -1,0 +1,159 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.COSIE_framework" href="COSIE.COSIE_framework.html" />
+    <link rel="prev" title="API documentation" href="../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">COSIE</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+      <li class="breadcrumb-item active">COSIE</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-COSIE">
+<span id="cosie"></span><h1>COSIE<a class="headerlink" href="#module-COSIE" title="Link to this heading">¶</a></h1>
+<p class="rubric">Submodules</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.COSIE_framework.html#module-COSIE.COSIE_framework" title="COSIE.COSIE_framework"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COSIE_framework</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.configure.html#module-COSIE.configure" title="COSIE.configure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configure</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.data_preprocessing.html#module-COSIE.data_preprocessing" title="COSIE.data_preprocessing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_preprocessing</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.html#module-COSIE.downstream_analysis" title="COSIE.downstream_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">downstream_analysis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.image_preprocessing.html#module-COSIE.image_preprocessing" title="COSIE.image_preprocessing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image_preprocessing</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.linkage_construction.html#module-COSIE.linkage_construction" title="COSIE.linkage_construction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linkage_construction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.loss.html#module-COSIE.loss" title="COSIE.loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loss</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.model_component.html#module-COSIE.model_component" title="COSIE.model_component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_component</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.utils.html#module-COSIE.utils" title="COSIE.utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utils</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api.html" class="btn btn-neutral float-left" title="API documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.COSIE_framework.html" class="btn btn-neutral float-right" title="COSIE.COSIE_framework" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

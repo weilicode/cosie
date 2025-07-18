@@ -1,0 +1,809 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.COSIE_framework &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">COSIE.COSIE_framework</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for COSIE.COSIE_framework</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">.model_component</span> <span class="kn">import</span> <span class="n">GraphAutoencoder</span><span class="p">,</span> <span class="n">Prediction_mlp</span>
+<span class="kn">from</span> <span class="nn">.linkage_construction</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.data_preprocessing</span> <span class="kn">import</span> <span class="n">reconstruct_metacell_to_original</span>
+<span class="kn">from</span> <span class="nn">.loss</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+
+
+
+
+<div class="viewcode-block" id="COSIE_model">
+<a class="viewcode-back" href="../../api/COSIE.COSIE_framework.COSIE_model.html#COSIE.COSIE_framework.COSIE_model">[docs]</a>
+<span class="k">class</span> <span class="nc">COSIE_model</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The core model class of the COSIE framework, designed for spatial multimodal integration, imputation, and enhancement across multiple tissue sections. This class defines the model structure, and handles both training and inference in full-graph or subgraph settings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : dict</span>
+<span class="sd">        Configuration dictionary defining architecture and training hyperparameters.</span>
+<span class="sd">        Includes sub-configs for GraphAutoencoder, Prediction modules, and training settings.</span>
+<span class="sd">        This can be customized in configure script. </span>
+<span class="sd">    </span>
+<span class="sd">    feature_dict : dict</span>
+<span class="sd">        A dictionary mapping section names (e.g., `&#39;s1&#39;`, `&#39;s2&#39;`) to a sub-dictionary of processed feature tensors for each modality (as `torch.FloatTensor`). </span>
+<span class="sd">        Format:</span>
+<span class="sd">        {&#39;s1&#39;: {&#39;RNA&#39;: tensor[n_cells, d], &#39;Protein&#39;: tensor[n_cells, d], ...},&#39;s2&#39;: {...}, ...}</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    autoencoders : nn.ModuleDict</span>
+<span class="sd">        Dictionary of GraphAutoencoder models per modality.</span>
+<span class="sd">    </span>
+<span class="sd">    predictors : nn.ModuleDict</span>
+<span class="sd">        Dictionary of Prediction modules for all available modality pairs.</span>
+<span class="sd">    </span>
+<span class="sd">    triplet_loss_fn : torch.nn.TripletMarginLoss</span>
+<span class="sd">        Loss function used for cross-section integration.</span>
+<span class="sd">    </span>
+<span class="sd">    latent_dim : int</span>
+<span class="sd">        Embedding dimension.</span>
+<span class="sd">    </span>
+<span class="sd">    all_modalities : list</span>
+<span class="sd">        List of all detected modalities across sections.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    to_device()</span>
+<span class="sd">        Move the entire model, including all submodules, to a specified device.</span>
+<span class="sd">    </span>
+<span class="sd">    train_model()</span>
+<span class="sd">        Train the model on either the full graph or spatially partitioned subgraphs, depending on the `n_x` and `n_y` grid splits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">feature_dict</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">COSIE_model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;GraphAutoencoder&#39;</span><span class="p">][</span><span class="s1">&#39;hidden_dim&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triplet_loss_fn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">TripletMarginLoss</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+
+        <span class="n">modality_dims</span> <span class="o">=</span> <span class="p">{}</span>  
+        
+        <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">modality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">modality_dims</span><span class="p">:</span>
+                    <span class="n">modality_dims</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  
+                    <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modality</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All modalities:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleDict</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------- Encoder description --------&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">input_dim</span> <span class="ow">in</span> <span class="n">modality_dims</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">encoder_dim</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;GraphAutoencoder&#39;</span><span class="p">][</span><span class="s1">&#39;hidden_dim&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">GraphAutoencoder</span><span class="p">(</span>
+                <span class="n">encoder_dim</span><span class="p">,</span>
+                <span class="n">config</span><span class="p">[</span><span class="s1">&#39;GraphAutoencoder&#39;</span><span class="p">][</span><span class="s1">&#39;activations&#39;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Encoder [</span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2">]: Input </span><span class="si">{</span><span class="n">input_dim</span><span class="si">}</span><span class="s2"> → Hidden </span><span class="si">{</span><span class="n">encoder_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleDict</span><span class="p">()</span>
+        <span class="n">created_predictors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------- Dual prediction module description --------&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">modality_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">modalities</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mod1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modality_list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">mod2</span> <span class="ow">in</span> <span class="n">modality_list</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]:</span>  
+                    <span class="n">predictor_name_1</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">predictor_name_2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">&quot;</span>
+        
+                    <span class="k">if</span> <span class="n">predictor_name_1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">created_predictors</span><span class="p">:</span>
+                        <span class="n">pred_dim</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;Prediction&#39;</span><span class="p">][</span><span class="s1">&#39;hidden_dim&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="n">predictor_name_1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Prediction_mlp</span><span class="p">(</span><span class="n">pred_dim</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="n">predictor_name_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Prediction_mlp</span><span class="p">(</span><span class="n">pred_dim</span><span class="p">)</span> 
+                        <span class="n">created_predictors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">predictor_name_1</span><span class="p">)</span>
+                        <span class="n">created_predictors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">predictor_name_2</span><span class="p">)</span>
+        
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predictor [</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">]: </span><span class="si">{</span><span class="n">pred_dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predictor [</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">]: </span><span class="si">{</span><span class="n">pred_dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="COSIE_model.to_device">
+<a class="viewcode-back" href="../../api/COSIE.COSIE_framework.COSIE_model.to_device.html#COSIE.COSIE_framework.COSIE_model.to_device">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Move all model parameters and submodules to the specified device.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        device : str</span>
+<span class="sd">            Target device identifier (e.g., `&#39;cuda:0&#39;`, `&#39;cpu&#39;`).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model moved to </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="COSIE_model.train_model">
+<a class="viewcode-back" href="../../api/COSIE.COSIE_framework.COSIE_model.train_model.html#COSIE.COSIE_framework.COSIE_model.train_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">feature_dict</span><span class="p">,</span> <span class="n">spatial_loc_dict</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">,</span> <span class="n">Linkage_indicator</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">n_x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_y</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train the COSIE model on spatial multimodal data.</span>
+
+<span class="sd">        Supports both full-graph and subgraph-level training. The training mode is selected</span>
+<span class="sd">        based on the `n_x` and `n_y` values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path : str</span>
+<span class="sd">            Directory path where final embeddings will be saved as `.npy` files.</span>
+<span class="sd">        </span>
+<span class="sd">        config : dict</span>
+<span class="sd">            Configuration dictionary defining model and training hyperparameters.</span>
+<span class="sd">        </span>
+<span class="sd">        optimizer : torch.optim.Optimizer</span>
+<span class="sd">            Optimizer for updating model parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        device : str</span>
+<span class="sd">            Device identifier (e.g., `&#39;cuda:0&#39;`, `&#39;cpu&#39;`).</span>
+<span class="sd">        </span>
+<span class="sd">        feature_dict : dict</span>
+<span class="sd">            A dictionary mapping each section name (e.g., `&#39;s1&#39;`, `&#39;s2&#39;`) to a sub-dictionary of processed feature tensors for each modality. Each feature is a `torch.FloatTensor`.</span>
+<span class="sd">        </span>
+<span class="sd">        spatial_loc_dict : dict</span>
+<span class="sd">            A dictionary mapping each section name to a 2D NumPy array of spatial coordinates.</span>
+<span class="sd">        </span>
+<span class="sd">        data_dict : dict</span>
+<span class="sd">            A dictionary mapping each modality name (e.g., `&#39;RNA&#39;`, `&#39;Protein&#39;`) to a list of AnnData objects, one per tissue section. Each AnnData should contain `.X`, `.obs`, `.var`, and `.obsm[&#39;spatial&#39;]`. If a modality is missing from a section, use `None` as a placeholder in the list.</span>
+<span class="sd">        </span>
+<span class="sd">        Linkage_indicator : dict</span>
+<span class="sd">            A dictionary specifying which tissue section pairs and modality pairs should be linked.</span>
+<span class="sd">            Format:</span>
+<span class="sd">            </span>
+<span class="sd">            {(&quot;s1&quot;, &quot;s2&quot;): [(&quot;RNA&quot;, &quot;RNA&quot;), (&quot;RNA&quot;, &quot;Protein&quot;)],(&quot;s2&quot;, &quot;s3&quot;): [(&quot;ATAC&quot;, &quot;RNA&quot;)]}</span>
+<span class="sd">            </span>
+<span class="sd">            means: constructing linkage between section s1 and s2 using both RNA-RNA strong linkage and RNA-Protein weak linkage; constructing linkage between section s2 and s3 using ATAC-RNA linkage.</span>
+
+<span class="sd">        num_hvg : int, optional</span>
+<span class="sd">            Number of highly variable features to retain for feature matching during linkage construction. Default is 3000.</span>
+<span class="sd">        </span>
+<span class="sd">        n_x : int, optional</span>
+<span class="sd">            Number of spatial partitions along the x-axis per section. Default is 1. If set to 1, no splitting is applied.</span>
+<span class="sd">        </span>
+<span class="sd">        n_y : int, optional</span>
+<span class="sd">            Number of spatial partitions along the y-axis per section. Default is 1. If set to 1, no splitting is applied. When both `n_x = 1` and `n_y = 1` (default), the model runs in full-graph training mode. When either `n_x` or `n_y` is greater than 1, the model will switch to subgraph training mode and partitions each section into a grid of `n_x × n_y` subregions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        final_embeddings : dict</span>
+<span class="sd">            Dictionary mapping section names to their final learned embedding matrices as NumPy arrays.</span>
+<span class="sd">            These embeddings are also saved to `{file_path}/s1_embedding.npy`, etc.</span>
+<span class="sd">            Format:</span>
+<span class="sd">            </span>
+<span class="sd">            {&#39;s1&#39;: np.ndarray of shape (n1_cells, latent_dim), &#39;s2&#39;: np.ndarray of shape (n2_cells, latent_dim), ...}</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+
+        <span class="k">if</span> <span class="n">n_x</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">n_y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-------- Running Full-graph training mode --------&quot;</span><span class="p">)</span>
+            <span class="n">linkage_results</span> <span class="o">=</span> <span class="n">compute_linkages</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">Linkage_indicator</span><span class="p">,</span>  <span class="n">num_hvg</span><span class="o">=</span><span class="n">num_hvg</span><span class="p">)</span>
+
+                
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    
+            <span class="n">k_neighs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;knn_neighbors_spatial&#39;</span><span class="p">]</span> 
+            <span class="n">k_neighs_feature</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;knn_neighbors_feature&#39;</span><span class="p">]</span> 
+            <span class="n">complete_graph</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">spatial_graph</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------- Construction of input graphs --------&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------- Constructing spatial graph for </span><span class="si">{}</span><span class="s1"> --------&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="p">))</span>
+                <span class="n">spatial_knn</span> <span class="o">=</span> <span class="n">compute_knn_graph</span><span class="p">(</span><span class="n">spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="n">k_neighs</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">spatial_graph</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial_knn</span>
+        
+                <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Constructing feature graph for [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
+        
+
+                    <span class="n">feature_knn</span> <span class="o">=</span> <span class="n">compute_knn_graph</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">k_neighs_feature</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        
+                    <span class="n">combined_knn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">spatial_knn</span><span class="p">,</span> <span class="n">feature_knn</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="c1"># print(combined_knn)</span>
+        
+                    <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_knn</span>
+    
+            <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training started!&quot;</span><span class="p">)</span>
+        
+        
+            
+            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;epoch&#39;</span><span class="p">]),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Training Epochs&quot;</span><span class="p">):</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>  
+                
+                <span class="n">total_reconstruction_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">total_contrastive_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">total_prediction_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">total_triplet_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">embedding_dict</span> <span class="o">=</span> <span class="p">{}</span>  
+                
+                <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>  
+                            
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+                        <span class="n">encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span>  
+                        <span class="n">graph</span> <span class="o">=</span> <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span>  
+                        
+
+                        <span class="n">z</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+                        <span class="n">embeddings</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>  
+        
+                        <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+                        <span class="n">recon_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">reconstructed</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span>  
+                        <span class="n">total_reconstruction_loss</span> <span class="o">+=</span> <span class="n">recon_loss</span>
+                    
+                    <span class="n">embedding_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span>
+        
+                    <span class="n">modality_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">modalities</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mod1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modality_list</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">mod2</span> <span class="ow">in</span> <span class="n">modality_list</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]:</span>  
+                            
+                            <span class="n">contrastive_loss</span> <span class="o">=</span> <span class="n">crossview_contrastive_Loss</span><span class="p">(</span><span class="n">embeddings</span><span class="p">[</span><span class="n">mod1</span><span class="p">],</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod2</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;gamma&#39;</span><span class="p">])</span>
+                            <span class="n">total_contrastive_loss</span> <span class="o">+=</span> <span class="n">contrastive_loss</span>
+        
+                            <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_dual_prediction&#39;</span><span class="p">]:</span>
+                                <span class="n">pred_mod1_to_mod2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">mod1</span><span class="p">])</span>
+                                <span class="n">pred_mod2_to_mod1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">mod2</span><span class="p">])</span>
+                                <span class="n">prediction_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">pred_mod1_to_mod2</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod2</span><span class="p">])</span> <span class="o">+</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">pred_mod2_to_mod1</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod1</span><span class="p">])</span>
+                                <span class="n">total_prediction_loss</span> <span class="o">+=</span> <span class="n">prediction_loss</span>
+        
+                
+                <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_cross_section_integration&#39;</span><span class="p">]:</span>
+                
+                    <span class="n">final_embedding_dict</span> <span class="o">=</span> <span class="p">{}</span>  
+                
+                    
+                
+                    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">embeddings</span> <span class="ow">in</span> <span class="n">embedding_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                
+                        <span class="n">recovered_embeddings</span> <span class="o">=</span> <span class="p">{}</span>  
+                
+                        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="p">:</span>
+                                <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span>  
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">candidate_embeddings</span> <span class="o">=</span> <span class="p">[]</span>  
+                
+                                <span class="k">for</span> <span class="n">src_mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                    <span class="n">predictor_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src_mod</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="k">if</span> <span class="n">predictor_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">:</span>
+                                        <span class="n">candidate_embeddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="n">predictor_key</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">src_mod</span><span class="p">]))</span>
+                
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                    <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+                                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                                    <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">candidate_embeddings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No valid predictor found to recover [</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] in Section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">], using zero tensor!&quot;</span><span class="p">)</span>
+                                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                        <span class="n">sample_embedding</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">embeddings</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>  
+                                        <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample_embedding</span><span class="p">)</span>  
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">raise</span> <span class="n">Val</span>
+                
+                                <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">recovered_embedding</span>
+                
+                        <span class="n">concatenated_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">final_embedding_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">concatenated_embedding</span>
+                
+                    
+    
+    
+                    <span class="k">for</span> <span class="n">section_pair</span><span class="p">,</span> <span class="n">triplet_data</span> <span class="ow">in</span> <span class="n">linkage_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">sec1</span><span class="p">,</span> <span class="n">sec2</span> <span class="o">=</span> <span class="n">section_pair</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>  
+                
+                        <span class="n">neighborhood_s1</span> <span class="o">=</span> <span class="n">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">spatial_graph</span><span class="p">[</span><span class="n">sec1</span><span class="p">],</span> <span class="n">final_embedding_dict</span><span class="p">[</span><span class="n">sec1</span><span class="p">],</span> <span class="n">device</span><span class="p">)</span>
+                        <span class="n">neighborhood_s2</span> <span class="o">=</span> <span class="n">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">spatial_graph</span><span class="p">[</span><span class="n">sec2</span><span class="p">],</span> <span class="n">final_embedding_dict</span><span class="p">[</span><span class="n">sec2</span><span class="p">],</span> <span class="n">device</span><span class="p">)</span>
+                
+                        <span class="n">neighborhood_embedding_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">neighborhood_s1</span><span class="p">,</span> <span class="n">neighborhood_s2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                
+                        <span class="n">anchor_arr</span> <span class="o">=</span> <span class="n">neighborhood_embedding_matrix</span><span class="p">[</span><span class="n">triplet_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span>
+                        <span class="n">positive_arr</span> <span class="o">=</span> <span class="n">neighborhood_embedding_matrix</span><span class="p">[</span><span class="n">triplet_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
+                        <span class="n">negative_arr</span> <span class="o">=</span> <span class="n">neighborhood_embedding_matrix</span><span class="p">[</span><span class="n">triplet_data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span>
+                
+                        <span class="n">triplet_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">triplet_loss_fn</span><span class="p">(</span><span class="n">anchor_arr</span><span class="p">,</span> <span class="n">positive_arr</span><span class="p">,</span> <span class="n">negative_arr</span><span class="p">)</span>
+                
+                
+                        <span class="n">total_triplet_loss</span> <span class="o">+=</span> <span class="n">triplet_loss</span>
+            
+    
+                
+
+    
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">total_contrastive_loss</span> <span class="o">+</span> <span class="n">total_reconstruction_loss</span> <span class="o">*</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;lambda1&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_dual_prediction&#39;</span><span class="p">]:</span>
+                    <span class="n">loss</span> <span class="o">+=</span> <span class="n">total_prediction_loss</span> <span class="o">*</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;lambda2&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_cross_section_integration&#39;</span><span class="p">]:</span>
+                    <span class="n">loss</span> <span class="o">+=</span> <span class="n">total_triplet_loss</span> <span class="o">*</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;lambda3&#39;</span><span class="p">]</span>
+        
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        
+    
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running Evaluation...&quot;</span><span class="p">)</span>
+        
+                
+            <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        
+            
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">final_embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span>
+                        <span class="n">graph</span> <span class="o">=</span> <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span>
+                        <span class="n">z</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+                        <span class="n">embeddings</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>  
+
+        
+                    <span class="n">recovered_embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="p">:</span>
+                            <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> 
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing modality [</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] in Section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                            <span class="n">candidate_embeddings</span> <span class="o">=</span> <span class="p">[]</span> 
+            
+                            <span class="k">for</span> <span class="n">src_mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="n">predictor_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src_mod</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">&quot;</span>
+                                <span class="k">if</span> <span class="n">predictor_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using predictor [</span><span class="si">{</span><span class="n">src_mod</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] to recover missing embedding...&quot;</span><span class="p">)</span>
+                                    <span class="n">candidate_embeddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="n">predictor_key</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">src_mod</span><span class="p">]))</span>
+            
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+                            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">candidate_embeddings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No valid predictor found to recover [</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] in Section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">], using zero tensor!&quot;</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">sample_embedding</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">embeddings</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> 
+                                    <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample_embedding</span><span class="p">)</span>  
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="n">Val</span>
+                            <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">recovered_embedding</span>
+    
+    
+
+    
+                    <span class="n">concatenated_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="c1"># print(&#39;calculate neighborhood {}&#39;.format(section))</span>
+                    <span class="n">neighborhood_embedding</span> <span class="o">=</span> <span class="n">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">spatial_graph</span><span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="n">concatenated_embedding</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+                    <span class="n">bi_embedding</span> <span class="o">=</span> <span class="p">(</span><span class="n">concatenated_embedding</span><span class="o">+</span><span class="n">neighborhood_embedding</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span>
+                    <span class="n">bi_embedding_numpy</span> <span class="o">=</span> <span class="n">bi_embedding</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    
+                    <span class="c1"># If used metacell, reverse to original cell-level</span>
+                    <span class="n">section_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="mi">1</span> 
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">adata_list</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">section_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">adata_list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">adata_list</span><span class="p">[</span><span class="n">section_idx</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">adata_tmp</span> <span class="o">=</span> <span class="n">adata_list</span><span class="p">[</span><span class="n">section_idx</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="s1">&#39;meta_to_original&#39;</span> <span class="ow">in</span> <span class="n">adata_tmp</span><span class="o">.</span><span class="n">uns</span> <span class="ow">and</span> <span class="s1">&#39;original_cell_num&#39;</span> <span class="ow">in</span> <span class="n">adata_tmp</span><span class="o">.</span><span class="n">uns</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mapping metacell embedding back to original cells for Section </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> using modality [</span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                                <span class="n">bi_embedding_numpy</span> <span class="o">=</span> <span class="n">reconstruct_metacell_to_original</span><span class="p">(</span><span class="n">adata_tmp</span><span class="p">,</span> <span class="n">bi_embedding_numpy</span><span class="p">)</span>
+                            <span class="k">break</span>  
+                    
+                    <span class="n">final_embeddings</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">bi_embedding_numpy</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">_embedding.npy&quot;</span><span class="p">),</span> <span class="n">bi_embedding_numpy</span><span class="p">)</span>
+                    
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All embeddings have been saved to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+        
+            <span class="k">return</span> <span class="n">final_embeddings</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-------- Running Sub-graph training mode, n_x is </span><span class="si">{</span><span class="n">n_x</span><span class="si">}</span><span class="s2">, n_y is </span><span class="si">{</span><span class="n">n_y</span><span class="si">}</span><span class="s2"> --------&quot;</span><span class="p">)</span>
+            <span class="n">new_feature_dict</span><span class="p">,</span> <span class="n">new_spatial_loc_dict</span><span class="p">,</span> <span class="n">new_linkage_results</span> <span class="o">=</span> <span class="n">preprocess_data_for_subgraphs</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+                <span class="n">feature_dict</span><span class="p">,</span> <span class="n">spatial_loc_dict</span><span class="p">,</span> <span class="n">Linkage_indicator</span><span class="p">,</span> <span class="n">n_x</span><span class="o">=</span><span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="o">=</span><span class="n">n_y</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="n">num_hvg</span><span class="p">)</span>
+    
+
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    
+    
+            <span class="n">k_neighs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;knn_neighbors_spatial&#39;</span><span class="p">]</span> 
+            <span class="n">k_neighs_feature</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;knn_neighbors_feature&#39;</span><span class="p">]</span>  
+            <span class="n">complete_graph</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">spatial_graph</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">full_complete_graph</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1">#  Full graph for inference</span>
+            <span class="n">full_spatial_graph</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1">#  Full spatial graph for inference</span>
+    
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;---------------- Constructing Full Graph ----------------&#39;</span><span class="p">)</span>
+    
+            <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-------- Constructing full spatial graph for </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> --------&quot;</span><span class="p">)</span>
+                <span class="n">full_complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                <span class="n">spatial_knn_full</span> <span class="o">=</span> <span class="n">compute_knn_graph</span><span class="p">(</span><span class="n">spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="n">k_neighs</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">full_spatial_graph</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial_knn_full</span> 
+        
+                <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Constructing full feature graph for [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
+        
+                    <span class="n">feature_knn_full</span> <span class="o">=</span> <span class="n">construct_knn_graph_hnsw</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k_neighs_feature</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">combined_knn_full</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">spatial_knn_full</span><span class="p">,</span> <span class="n">feature_knn_full</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+                    <span class="n">full_complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_knn_full</span>
+    
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;---------------- Graph Construction in Subgraph Level ----------------&#39;</span><span class="p">)</span>
+        
+            <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">subgraphs</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">spatial_graph</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                <span class="k">for</span> <span class="n">sub_idx</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">subgraphs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-------- Constructing spatial graphs for </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> - Subgraph </span><span class="si">{</span><span class="n">sub_idx</span><span class="si">}</span><span class="s2"> --------&quot;</span><span class="p">)</span>
+        
+                    <span class="n">spatial_knn</span> <span class="o">=</span> <span class="n">compute_knn_graph</span><span class="p">(</span><span class="n">new_spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">],</span> <span class="n">k_neighs</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">spatial_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial_knn</span>  
+        
+                    <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-------- Constructing feature graph for [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> - Subgraph </span><span class="si">{</span><span class="n">sub_idx</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2">] --------&quot;</span><span class="p">)</span>
+        
+                        <span class="n">feature_knn</span> <span class="o">=</span> <span class="n">construct_knn_graph_hnsw</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">k_neighs_feature</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        
+                        <span class="n">combined_knn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">spatial_knn</span><span class="p">,</span> <span class="n">feature_knn</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+                        <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_knn</span>
+        
+            <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">subgraphs</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">sub_idx</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">subgraphs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+                        <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> 
+        
+            <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  
+        
+
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training started!&quot;</span><span class="p">)</span>
+            
+            
+            <span class="n">num_subgraphs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">new_feature_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>  
+            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;epoch&#39;</span><span class="p">]),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Training Epochs&quot;</span><span class="p">):</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>  
+            
+                <span class="n">total_reconstruction_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">total_contrastive_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">total_prediction_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">total_triplet_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+            
+                <span class="n">shuffled_subgraph_indices</span> <span class="o">=</span> <span class="p">{</span><span class="n">section</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_subgraphs</span><span class="p">),</span> <span class="n">num_subgraphs</span><span class="p">)</span> <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="p">}</span>
+            
+                <span class="k">for</span> <span class="n">batch_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_subgraphs</span><span class="p">):</span>  
+                    <span class="n">embedding_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            
+                    <span class="n">batch_subgraphs</span> <span class="o">=</span> <span class="p">{</span><span class="n">section</span><span class="p">:</span> <span class="n">shuffled_subgraph_indices</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">batch_idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="p">}</span>
+
+            
+                    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">sub_idx</span> <span class="ow">in</span> <span class="n">batch_subgraphs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">features_dict</span> <span class="o">=</span> <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span>  
+                        <span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+            
+                        <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">features_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span>  
+                            <span class="n">graph</span> <span class="o">=</span> <span class="n">complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span>  
+                            
+                            <span class="n">z</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+                            <span class="n">embeddings</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>  
+                            
+                            <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+                            <span class="n">recon_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">reconstructed</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span> 
+                            <span class="n">total_reconstruction_loss</span> <span class="o">+=</span> <span class="n">recon_loss</span>
+                        
+                        <span class="n">embedding_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span>  
+            
+                        <span class="n">modality_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">features_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  
+                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mod1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modality_list</span><span class="p">):</span>
+                            <span class="k">for</span> <span class="n">mod2</span> <span class="ow">in</span> <span class="n">modality_list</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]:</span>  
+                                
+                                <span class="n">contrastive_loss</span> <span class="o">=</span> <span class="n">crossview_contrastive_Loss</span><span class="p">(</span><span class="n">embeddings</span><span class="p">[</span><span class="n">mod1</span><span class="p">],</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod2</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;gamma&#39;</span><span class="p">])</span>
+                                <span class="n">total_contrastive_loss</span> <span class="o">+=</span> <span class="n">contrastive_loss</span>
+            
+                                <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_dual_prediction&#39;</span><span class="p">]:</span>
+                                    <span class="n">pred_mod1_to_mod2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">mod1</span><span class="p">])</span>
+                                    <span class="n">pred_mod2_to_mod1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mod2</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">mod2</span><span class="p">])</span>
+                                    <span class="n">prediction_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">pred_mod1_to_mod2</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod2</span><span class="p">])</span> <span class="o">+</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">pred_mod2_to_mod1</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod1</span><span class="p">])</span>
+                                    <span class="n">total_prediction_loss</span> <span class="o">+=</span> <span class="n">prediction_loss</span>
+            
+                    <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_cross_section_integration&#39;</span><span class="p">]:</span>
+                        <span class="n">final_embedding_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            
+                        <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">embeddings</span> <span class="ow">in</span> <span class="n">embedding_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">recovered_embeddings</span> <span class="o">=</span> <span class="p">{}</span> 
+            
+                            <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="p">:</span>
+                                    <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span>  
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">candidate_embeddings</span> <span class="o">=</span> <span class="p">[]</span> 
+                                    <span class="k">for</span> <span class="n">src_mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                        <span class="n">predictor_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src_mod</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">&quot;</span>
+                                        <span class="k">if</span> <span class="n">predictor_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">:</span>
+                                            <span class="n">candidate_embeddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="n">predictor_key</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">src_mod</span><span class="p">]))</span>
+            
+                                    
+                                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                        <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+                                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                                        <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">candidate_embeddings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; No valid predictor found to recover [</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] in Section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">], using zero tensor!&quot;</span><span class="p">)</span>
+                                        <span class="n">sample_embedding</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">embeddings</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+                                        <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample_embedding</span><span class="p">)</span> <span class="k">if</span> <span class="n">sample_embedding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            
+                                    <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">recovered_embedding</span>
+            
+                            <span class="n">concatenated_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="n">final_embedding_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">concatenated_embedding</span>
+            
+                       
+                        <span class="n">batch_subgraph_pairs</span> <span class="o">=</span> <span class="p">{(</span><span class="n">sec1</span><span class="p">,</span> <span class="n">sub1</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2</span><span class="p">)</span> <span class="k">for</span> <span class="n">sec1</span><span class="p">,</span> <span class="n">sub1</span> <span class="ow">in</span> <span class="n">batch_subgraphs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">for</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2</span> <span class="ow">in</span> <span class="n">batch_subgraphs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">sec1</span> <span class="o">!=</span> <span class="n">sec2</span><span class="p">}</span>
+                        
+                        <span class="k">for</span> <span class="n">sec1</span><span class="p">,</span> <span class="n">sub1</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2</span> <span class="ow">in</span> <span class="n">batch_subgraph_pairs</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="n">sec1</span><span class="p">,</span> <span class="n">sub1</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_linkage_results</span><span class="p">:</span>
+                                <span class="n">triplet_data</span> <span class="o">=</span> <span class="n">new_linkage_results</span><span class="p">[(</span><span class="n">sec1</span><span class="p">,</span> <span class="n">sub1</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2</span><span class="p">)]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">continue</span>  
+                            
+                        
+                            <span class="n">neighborhood_s1</span> <span class="o">=</span> <span class="n">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">spatial_graph</span><span class="p">[</span><span class="n">sec1</span><span class="p">][</span><span class="n">sub1</span><span class="p">],</span> <span class="n">final_embedding_dict</span><span class="p">[</span><span class="n">sec1</span><span class="p">],</span> <span class="n">device</span><span class="p">)</span>
+                            <span class="n">neighborhood_s2</span> <span class="o">=</span> <span class="n">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">spatial_graph</span><span class="p">[</span><span class="n">sec2</span><span class="p">][</span><span class="n">sub2</span><span class="p">],</span> <span class="n">final_embedding_dict</span><span class="p">[</span><span class="n">sec2</span><span class="p">],</span> <span class="n">device</span><span class="p">)</span>
+                            <span class="n">neighborhood_embedding_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">neighborhood_s1</span><span class="p">,</span> <span class="n">neighborhood_s2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                        
+                            <span class="n">anchor_arr</span> <span class="o">=</span> <span class="n">neighborhood_embedding_matrix</span><span class="p">[</span><span class="n">triplet_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span>
+                            <span class="n">positive_arr</span> <span class="o">=</span> <span class="n">neighborhood_embedding_matrix</span><span class="p">[</span><span class="n">triplet_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
+                            <span class="n">negative_arr</span> <span class="o">=</span> <span class="n">neighborhood_embedding_matrix</span><span class="p">[</span><span class="n">triplet_data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span>
+                        
+                            <span class="n">triplet_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">triplet_loss_fn</span><span class="p">(</span><span class="n">anchor_arr</span><span class="p">,</span> <span class="n">positive_arr</span><span class="p">,</span> <span class="n">negative_arr</span><span class="p">)</span>
+                            <span class="n">total_triplet_loss</span> <span class="o">+=</span> <span class="n">triplet_loss</span>
+    
+
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">total_contrastive_loss</span> <span class="o">+</span> <span class="n">total_reconstruction_loss</span> <span class="o">*</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;lambda1&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_dual_prediction&#39;</span><span class="p">]:</span>
+                    <span class="n">loss</span> <span class="o">+=</span> <span class="n">total_prediction_loss</span> <span class="o">*</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;lambda2&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;start_cross_section_integration&#39;</span><span class="p">]:</span>
+                    <span class="n">loss</span> <span class="o">+=</span> <span class="n">total_triplet_loss</span> <span class="o">*</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;lambda3&#39;</span><span class="p">]</span>
+            
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            
+    
+    
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; Running Evaluation...&quot;</span><span class="p">)</span>
+        
+                
+            <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    
+            
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">final_embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+        
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoencoders</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span>
+                        <span class="n">graph</span> <span class="o">=</span> <span class="n">full_complete_graph</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span>
+                        <span class="n">z</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+                        <span class="n">embeddings</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>  
+
+        
+                    <span class="n">recovered_embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="p">:</span>
+                            <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span>  
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing modality [</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] in Section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                            <span class="n">candidate_embeddings</span> <span class="o">=</span> <span class="p">[]</span>  
+            
+                            <span class="k">for</span> <span class="n">src_mod</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="n">predictor_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src_mod</span><span class="si">}</span><span class="s2">_to_</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">&quot;</span>
+                                <span class="k">if</span> <span class="n">predictor_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using predictor [</span><span class="si">{</span><span class="n">src_mod</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] to recover missing embedding...&quot;</span><span class="p">)</span>
+                                    <span class="n">candidate_embeddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictors</span><span class="p">[</span><span class="n">predictor_key</span><span class="p">](</span><span class="n">embeddings</span><span class="p">[</span><span class="n">src_mod</span><span class="p">]))</span>
+            
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+                            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate_embeddings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">candidate_embeddings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No valid predictor found to recover [</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2">] in Section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">], using zero tensor!&quot;</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">sample_embedding</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">embeddings</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> 
+                                    <span class="n">recovered_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample_embedding</span><span class="p">)</span>  
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="n">Val</span>
+                            <span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="n">recovered_embedding</span>
+    
+    
+
+    
+                    <span class="n">concatenated_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">recovered_embeddings</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_modalities</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="c1"># print(&#39;calculate neighborhood {}&#39;.format(section))</span>
+                    <span class="n">neighborhood_embedding</span> <span class="o">=</span> <span class="n">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">full_spatial_graph</span><span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="n">concatenated_embedding</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+                    <span class="n">bi_embedding</span> <span class="o">=</span> <span class="p">(</span><span class="n">concatenated_embedding</span><span class="o">+</span><span class="n">neighborhood_embedding</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span>
+                    <span class="n">bi_embedding_numpy</span> <span class="o">=</span> <span class="n">bi_embedding</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    
+                    <span class="n">section_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="mi">1</span>  
+                    <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">adata_list</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">section_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">adata_list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">adata_list</span><span class="p">[</span><span class="n">section_idx</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">adata_tmp</span> <span class="o">=</span> <span class="n">adata_list</span><span class="p">[</span><span class="n">section_idx</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="s1">&#39;meta_to_original&#39;</span> <span class="ow">in</span> <span class="n">adata_tmp</span><span class="o">.</span><span class="n">uns</span> <span class="ow">and</span> <span class="s1">&#39;original_cell_num&#39;</span> <span class="ow">in</span> <span class="n">adata_tmp</span><span class="o">.</span><span class="n">uns</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mapping metacell embedding back to original cells for Section </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2"> using modality [</span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                                <span class="n">bi_embedding_numpy</span> <span class="o">=</span> <span class="n">reconstruct_metacell_to_original</span><span class="p">(</span><span class="n">adata_tmp</span><span class="p">,</span> <span class="n">bi_embedding_numpy</span><span class="p">)</span>
+                            <span class="k">break</span>  
+                    
+                    <span class="n">final_embeddings</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">bi_embedding_numpy</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">_embedding.npy&quot;</span><span class="p">),</span> <span class="n">bi_embedding_numpy</span><span class="p">)</span>
+                    
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All embeddings have been saved to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+        
+            <span class="k">return</span> <span class="n">final_embeddings</span></div>
+</div>
+
+
+    
+        
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="c1">###</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

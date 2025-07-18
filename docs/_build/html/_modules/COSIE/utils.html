@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.utils &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">COSIE.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for COSIE.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">negative_sampling</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance_matrix</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">kneighbors_graph</span> 
+
+
+<span class="kn">from</span> <span class="nn">annoy</span> <span class="kn">import</span> <span class="n">AnnoyIndex</span>
+<span class="kn">import</span> <span class="nn">hnswlib</span>
+
+
+
+
+
+<div class="viewcode-block" id="nn_approx">
+<a class="viewcode-back" href="../../api/COSIE.utils.nn_approx.html#COSIE.utils.nn_approx">[docs]</a>
+<span class="k">def</span> <span class="nf">nn_approx</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">n_trees</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Efficiently find approximate K-nearest neighbors using the Annoy library.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds1 : np.ndarray</span>
+<span class="sd">        Query data of shape (n_query, dim), where neighbors will be searched for.</span>
+<span class="sd">    </span>
+<span class="sd">    ds2 : np.ndarray</span>
+<span class="sd">        Reference data of shape (n_ref, dim), in which the neighbors are searched.</span>
+<span class="sd">    </span>
+<span class="sd">    knn : int, optional</span>
+<span class="sd">        Number of neighbors to retrieve per query. Default is 10.</span>
+<span class="sd">    </span>
+<span class="sd">    metric : str, optional</span>
+<span class="sd">        Distance metric used in Annoy. Must be one of: {&#39;euclidean&#39;, &#39;manhattan&#39;, &#39;angular&#39;, &#39;hamming&#39;, &#39;dot&#39;}. Default is &#39;euclidean&#39;.</span>
+<span class="sd">    </span>
+<span class="sd">    n_trees : int, optional</span>
+<span class="sd">        Number of trees used to build the Annoy index. Higher values increase accuracy at the cost of indexing time. Default is 10.</span>
+<span class="sd">    </span>
+<span class="sd">    include_distances : bool, optional</span>
+<span class="sd">        Whether to also return distances to the nearest neighbors. Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ind : np.ndarray</span>
+<span class="sd">        If `include_distances` is False, returns an array of shape (n_query, knn) with indices of nearest neighbors.</span>
+
+<span class="sd">    tuple of (ind, dist) : (np.ndarray, np.ndarray)</span>
+<span class="sd">        If `include_distances` is True, returns a tuple:</span>
+<span class="sd">        </span>
+<span class="sd">        - `ind` : array of shape (n_query, knn) with indices of nearest neighbors.</span>
+<span class="sd">        - `dist` : array of shape (n_query, knn) with corresponding distances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="c1"># Build index.</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">AnnoyIndex</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">ds2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">n_trees</span><span class="p">)</span>
+
+    <span class="c1"># Search index.</span>
+    <span class="n">ind</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">i_ind</span><span class="p">,</span> <span class="n">i_dist</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get_nns_by_vector</span><span class="p">(</span><span class="n">ds1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">knn</span><span class="p">,</span> <span class="n">search_k</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_ind</span><span class="p">)</span>
+        <span class="n">dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_dist</span><span class="p">)</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">include_distances</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ind</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># return ind.flatten()</span>
+        <span class="k">return</span> <span class="n">ind</span></div>
+
+
+
+<div class="viewcode-block" id="setup_seed">
+<a class="viewcode-back" href="../../api/COSIE.utils.setup_seed.html#COSIE.utils.setup_seed">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;fast&#39;</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the random seed for Python, NumPy, and PyTorch to ensure reproducibility.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        The random seed to be set for all relevant libraries. Default is 8.</span>
+<span class="sd">    mode : str, optional</span>
+<span class="sd">        Controls how strictly reproducibility is enforced. Must be one of {&#39;fast&#39;, &#39;strict&#39;}.</span>
+<span class="sd">        </span>
+<span class="sd">        - &#39;fast&#39;: Ensures reproducibility in most cases, with minimal performance impact.  </span>
+<span class="sd">        - &#39;strict&#39;: Enforces full determinism across all operations (including CUDA),</span>
+<span class="sd">          but may significantly slow down certain models.</span>
+
+<span class="sd">        It is recommended to use &#39;strict&#39; only when exact reproducibility across runs is required.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYTHONHASHSEED&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="c1"># control cuDNN </span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># strict mode</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
+        <span class="c1">### This will slow down the learning process</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="p">,</span> <span class="s1">&#39;use_deterministic_algorithms&#39;</span><span class="p">):</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">use_deterministic_algorithms</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUBLAS_WORKSPACE_CONFIG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;:16:8&#39;</span></div>
+
+
+
+
+
+
+<div class="viewcode-block" id="compute_knn_graph">
+<a class="viewcode-back" href="../../api/COSIE.utils.compute_knn_graph.html#COSIE.utils.compute_knn_graph">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_knn_graph</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a k-nearest neighbors (k-NN) graph based on an input feature matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_data : np.ndarray</span>
+<span class="sd">        An array of shape (n_cells, n_features) representing input features of cells,</span>
+<span class="sd">        which can be spatial coordinates or feature vectors.</span>
+<span class="sd">    </span>
+<span class="sd">    n_neighbors : int</span>
+<span class="sd">        Number of nearest neighbors to connect for each node.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    edge_index : torch.LongTensor</span>
+<span class="sd">        A tensor of shape (2, num_edges) representing the edges of the graph. Each column (i, j) represents an edge from node i to its j-th nearest neighbor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nbrs</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neighbors</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>  
+    <span class="n">_</span> <span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">nbrs</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> 
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>    
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">edge_index</span></div>
+
+
+
+
+
+
+
+<div class="viewcode-block" id="construct_knn_graph_hnsw">
+<a class="viewcode-back" href="../../api/COSIE.utils.construct_knn_graph_hnsw.html#COSIE.utils.construct_knn_graph_hnsw">[docs]</a>
+<span class="k">def</span> <span class="nf">construct_knn_graph_hnsw</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Efficiently compute approximate k-nearest neighbor (k-NN) graph using the hnswlib library.</span>
+<span class="sd">    This method is suitable for large-scale datasets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : torch.Tensor</span>
+<span class="sd">        A tensor of shape (n_cells, n_features) representing the input feature matrix.</span>
+<span class="sd">    </span>
+<span class="sd">    k : int, optional</span>
+<span class="sd">        Number of nearest neighbors to retrieve for each sample. Default is 20.</span>
+<span class="sd">    </span>
+<span class="sd">    space : str, optional</span>
+<span class="sd">        Distance metric used to build the index. Must be one of {&#39;l2&#39;, &#39;ip&#39;, &#39;cosine&#39;}.</span>
+<span class="sd">        </span>
+<span class="sd">        - &#39;l2&#39;: Euclidean distance  </span>
+<span class="sd">        - &#39;ip&#39;: Inner product  </span>
+<span class="sd">        - &#39;cosine&#39;: Cosine similarity  </span>
+
+<span class="sd">        Default is &#39;l2&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    edge_index : torch.LongTensor</span>
+<span class="sd">        A tensor of shape (2, n_edges) representing the edges of the graph.</span>
+<span class="sd">        Each column represents an edge from source node to target node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">num_samples</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">hnswlib</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">space</span><span class="o">=</span><span class="n">space</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">init_index</span><span class="p">(</span><span class="n">max_elements</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">ef_construction</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_items</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">p</span><span class="o">.</span><span class="n">set_ef</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="n">indices</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">knn_query</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    
+    <span class="n">row_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">),</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">col_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">row_indices</span><span class="p">,</span> <span class="n">col_indices</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">edge_index</span></div>
+
+
+
+
+<div class="viewcode-block" id="compute_neighborhood_embedding">
+<a class="viewcode-back" href="../../api/COSIE.utils.compute_neighborhood_embedding.html#COSIE.utils.compute_neighborhood_embedding">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_neighborhood_embedding</span><span class="p">(</span><span class="n">edge_index_spatial</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">embedding_matrix</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the neighborhood embedding of each cell based on its spatial k-nearest neighbor graph.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    edge_index_spatial : torch.Tensor</span>
+<span class="sd">        A tensor of shape (2, num_edges), where each column represents a directed edge from source node to target node in the spatial graph.</span>
+<span class="sd">    </span>
+<span class="sd">    embedding_matrix : torch.Tensor</span>
+<span class="sd">        A tensor of shape (n_cells, dim) representing the embedding of each cell.</span>
+<span class="sd">    </span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        The computation device, e.g., `torch.device(&#39;cuda&#39;)` or `torch.device(&#39;cpu&#39;)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    neighborhood_embedding_matrix : torch.Tensor</span>
+<span class="sd">        A tensor of shape (n_cells, dim) representing the average of each cell’s neighbors&#39; embeddings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    
+    <span class="c1"># Get the number of nodes and embedding dimension</span>
+    <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">embedding_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">embedding_dim</span> <span class="o">=</span> <span class="n">embedding_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="c1"># Initialize the neighborhood embedding matrix and count tensor</span>
+    <span class="n">neighborhood_embedding_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">neighbor_count</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="c1"># Use edge_index_spatial to index into the embedding matrix</span>
+    <span class="n">source_nodes</span> <span class="o">=</span> <span class="n">edge_index_spatial</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Get source nodes</span>
+    <span class="n">target_nodes</span> <span class="o">=</span> <span class="n">edge_index_spatial</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Get target nodes</span>
+
+    <span class="c1"># Accumulate the embeddings from target nodes to the corresponding source nodes</span>
+    <span class="n">neighborhood_embedding_matrix</span><span class="o">.</span><span class="n">index_add_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">source_nodes</span><span class="p">,</span> <span class="n">embedding_matrix</span><span class="p">[</span><span class="n">target_nodes</span><span class="p">])</span>
+    
+    <span class="c1"># Count neighbors for each source node</span>
+    <span class="n">neighbor_count</span><span class="o">.</span><span class="n">index_add_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">source_nodes</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">target_nodes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">))</span>
+
+    <span class="c1"># Avoid division by zero by replacing zero counts with one</span>
+    <span class="n">neighbor_count</span><span class="p">[</span><span class="n">neighbor_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Compute the average by dividing by the count of neighbors</span>
+    <span class="n">neighborhood_embedding_matrix</span> <span class="o">/=</span> <span class="n">neighbor_count</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+
+    <span class="k">return</span> <span class="n">neighborhood_embedding_matrix</span></div>
+
+
+    
+
+
+
+
+
+<span class="c1">##</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

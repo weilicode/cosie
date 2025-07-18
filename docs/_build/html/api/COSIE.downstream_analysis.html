@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.downstream_analysis &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.downstream_analysis.cluster_and_visualize" href="COSIE.downstream_analysis.cluster_and_visualize.html" />
+    <link rel="prev" title="COSIE.data_preprocessing.reconstruct_metacell_to_original" href="COSIE.data_preprocessing.reconstruct_metacell_to_original.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">COSIE.downstream_analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize.html">COSIE.downstream_analysis.cluster_and_visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize_superpixel.html">COSIE.downstream_analysis.cluster_and_visualize_superpixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.create_normalized_adata.html">COSIE.downstream_analysis.create_normalized_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.highlight_joint_clusters_all_sections.html">COSIE.downstream_analysis.highlight_joint_clusters_all_sections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html">COSIE.downstream_analysis.merge_clusters_to_new_ids</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.perform_imputation.html">COSIE.downstream_analysis.perform_imputation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_histology_clusters.html">COSIE.downstream_analysis.plot_histology_clusters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison.html">COSIE.downstream_analysis.plot_marker_comparison</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison_superpixel.html">COSIE.downstream_analysis.plot_marker_comparison_superpixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.prepare_image.html">COSIE.downstream_analysis.prepare_image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.relabel_clusters_sequentially.html">COSIE.downstream_analysis.relabel_clusters_sequentially</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html">COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html">COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+      <li class="breadcrumb-item active">COSIE.downstream_analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-COSIE.downstream_analysis">
+<span id="cosie-downstream-analysis"></span><h1>COSIE.downstream_analysis<a class="headerlink" href="#module-COSIE.downstream_analysis" title="Link to this heading">¶</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize.html#COSIE.downstream_analysis.cluster_and_visualize" title="COSIE.downstream_analysis.cluster_and_visualize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_and_visualize</span></code></a></p></td>
+<td><p>Cluster cell embeddings and visualize the results for each tissue section at the spot level.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize_superpixel.html#COSIE.downstream_analysis.cluster_and_visualize_superpixel" title="COSIE.downstream_analysis.cluster_and_visualize_superpixel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_and_visualize_superpixel</span></code></a></p></td>
+<td><p>Perform clustering on superpixel embeddings across multiple tissue sections and visualize the results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.create_normalized_adata.html#COSIE.downstream_analysis.create_normalized_adata" title="COSIE.downstream_analysis.create_normalized_adata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_normalized_adata</span></code></a></p></td>
+<td><p>Create a new AnnData object by min-max scaling the expression matrix of the input <cite>adata</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.highlight_joint_clusters_all_sections.html#COSIE.downstream_analysis.highlight_joint_clusters_all_sections" title="COSIE.downstream_analysis.highlight_joint_clusters_all_sections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">highlight_joint_clusters_all_sections</span></code></a></p></td>
+<td><p>Visualize and highlight specified clusters across all tissue sections.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html#COSIE.downstream_analysis.merge_clusters_to_new_ids" title="COSIE.downstream_analysis.merge_clusters_to_new_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_clusters_to_new_ids</span></code></a></p></td>
+<td><p>Merge specified cluster IDs into new classes with IDs starting from current max + 1.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.perform_imputation.html#COSIE.downstream_analysis.perform_imputation" title="COSIE.downstream_analysis.perform_imputation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_imputation</span></code></a></p></td>
+<td><p>Perform KNN-based imputation for a specific modality in a target tissue section.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.plot_histology_clusters.html#COSIE.downstream_analysis.plot_histology_clusters" title="COSIE.downstream_analysis.plot_histology_clusters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_histology_clusters</span></code></a></p></td>
+<td><p>Visualize cluster maps from 2D cluster masks.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison.html#COSIE.downstream_analysis.plot_marker_comparison" title="COSIE.downstream_analysis.plot_marker_comparison"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_marker_comparison</span></code></a></p></td>
+<td><p>Compare the spatial expression pattern of a specified molecule (e.g., gene, protein..) across two tissue sections at the spot level, each represented by an AnnData object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison_superpixel.html#COSIE.downstream_analysis.plot_marker_comparison_superpixel" title="COSIE.downstream_analysis.plot_marker_comparison_superpixel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_marker_comparison_superpixel</span></code></a></p></td>
+<td><p>Plot side-by-side spatial expression comparison of a target molecule at the superpixel level.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.prepare_image.html#COSIE.downstream_analysis.prepare_image" title="COSIE.downstream_analysis.prepare_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_image</span></code></a></p></td>
+<td><p>Prepare a 2D image from molecule expression and spatial coordinates in an AnnData object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.relabel_clusters_sequentially.html#COSIE.downstream_analysis.relabel_clusters_sequentially" title="COSIE.downstream_analysis.relabel_clusters_sequentially"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relabel_clusters_sequentially</span></code></a></p></td>
+<td><p>Relabel all cluster IDs across sections to contiguous integers starting from 0.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html#COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram" title="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_global_cluster_centroid_dendrogram</span></code></a></p></td>
+<td><p>Visualize dendrogram for clusters shared across sections.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html#COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram" title="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_section_cluster_centroids_dendrogram</span></code></a></p></td>
+<td><p>Visualize hierarchical clustering dendrogram within a single section.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.data_preprocessing.reconstruct_metacell_to_original.html" class="btn btn-neutral float-left" title="COSIE.data_preprocessing.reconstruct_metacell_to_original" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.downstream_analysis.cluster_and_visualize.html" class="btn btn-neutral float-right" title="COSIE.downstream_analysis.cluster_and_visualize" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

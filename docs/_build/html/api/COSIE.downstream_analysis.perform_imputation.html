@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.downstream_analysis.perform_imputation &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.downstream_analysis.plot_histology_clusters" href="COSIE.downstream_analysis.plot_histology_clusters.html" />
+    <link rel="prev" title="COSIE.downstream_analysis.merge_clusters_to_new_ids" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize.html">COSIE.downstream_analysis.cluster_and_visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize_superpixel.html">COSIE.downstream_analysis.cluster_and_visualize_superpixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.create_normalized_adata.html">COSIE.downstream_analysis.create_normalized_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.highlight_joint_clusters_all_sections.html">COSIE.downstream_analysis.highlight_joint_clusters_all_sections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html">COSIE.downstream_analysis.merge_clusters_to_new_ids</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">COSIE.downstream_analysis.perform_imputation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_histology_clusters.html">COSIE.downstream_analysis.plot_histology_clusters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison.html">COSIE.downstream_analysis.plot_marker_comparison</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison_superpixel.html">COSIE.downstream_analysis.plot_marker_comparison_superpixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.prepare_image.html">COSIE.downstream_analysis.prepare_image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.relabel_clusters_sequentially.html">COSIE.downstream_analysis.relabel_clusters_sequentially</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html">COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html">COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+      <li class="breadcrumb-item active">COSIE.downstream_analysis.perform_imputation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cosie-downstream-analysis-perform-imputation">
+<h1>COSIE.downstream_analysis.perform_imputation<a class="headerlink" href="#cosie-downstream-analysis-perform-imputation" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="COSIE.downstream_analysis.perform_imputation">
+<span class="sig-name descname"><span class="pre">perform_imputation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_embeddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_modality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_sections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_molecules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'All'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/downstream_analysis.html#perform_imputation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.downstream_analysis.perform_imputation" title="Link to this definition">¶</a></dt>
+<dd><p>Perform KNN-based imputation for a specific modality in a target tissue section.</p>
+<p>The imputed values are computed by identifying the K nearest neighbors in the embedding space
+from source sections and averaging their expression values for the specified molecules. If accelerate = True, PCA will be conducted and imputation will be performed based on the PCA embedding instead.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl>
+<dt>data_dict<span class="classifier">dict</span></dt><dd><p>A dictionary where each key is a modality (e.g., <cite>‘RNA’</cite>, <cite>‘Protein’</cite>) and each value is a list of AnnData objects, one per tissue section. If a modality is missing in a section, use <cite>None</cite> as a placeholder.</p>
+</dd>
+<dt>final_embeddings<span class="classifier">dict</span></dt><dd><p>A dictionary mapping section names (e.g., <cite>‘s1’</cite>, <cite>‘s2’</cite>, …) to 2D NumPy arrays of shape (n_cells, latent_dim), representing cell embeddings for each section.</p>
+</dd>
+<dt>target_section<span class="classifier">str</span></dt><dd><p>The name of the section to impute (e.g., <cite>‘s1’</cite>).</p>
+</dd>
+<dt>target_modality<span class="classifier">str</span></dt><dd><p>The modality to impute (e.g., <cite>‘RNA’</cite>, <cite>‘Protein’</cite>, <cite>‘Metabolite’</cite>).</p>
+</dd>
+<dt>K_num<span class="classifier">int, optional</span></dt><dd><p>Number of nearest neighbors used for imputation. Default is 50.</p>
+</dd>
+<dt>source_sections<span class="classifier">list of str or None, optional</span></dt><dd><p>A list of section names to serve as the source data. If None, all sections with the target modality will be used. Default is None.</p>
+</dd>
+<dt>target_molecules<span class="classifier">str or list, optional</span></dt><dd><p>Features (genes, proteins, metabolites, etc.) to impute:</p>
+<ul class="simple">
+<li><p><cite>‘All’</cite>: Impute the intersection of all shared features across source sections.</p></li>
+<li><p>list: A specific list of features to impute (e.g., <cite>[‘CD4’, ‘CD68’]</cite>).</p></li>
+</ul>
+<p>Default is <cite>‘All’</cite>.</p>
+</dd>
+<dt>block_size<span class="classifier">int or None, optional</span></dt><dd><p>If set, perform block-wise imputation across features to reduce memory usage. Each block contains up to <cite>block_size</cite> features. Default is None.</p>
+</dd>
+<dt>metric<span class="classifier">str, optional</span></dt><dd><p>Distance metric used in approximate nearest neighbor search (via Annoy). Must be one of: {‘euclidean’, ‘manhattan’, ‘angular’, ‘hamming’, ‘dot’}. Default is <cite>‘euclidean’</cite>.</p>
+</dd>
+<dt>accelerate<span class="classifier">bool, optional</span></dt><dd><p>Whether to perform joint PCA dimensionality reduction (to 50 dimensions) on all embeddings before imputation. 
+This can accelerate nearest neighbor search and reduce memory usage. Default is False.</p>
+</dd>
+<dt>n_trees<span class="classifier">int, optional</span></dt><dd><p>Number of trees used to build the Annoy index. Larger values increase accuracy at the cost of indexing time. Default is 10.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>new_adata<span class="classifier">AnnData</span></dt><dd><p>A new AnnData object containing the imputed data. Includes:</p>
+<ul class="simple">
+<li><p><cite>.X</cite>: Imputed expression matrix as a dense NumPy array.</p></li>
+<li><p><cite>.obs</cite>: Metadata copied from the target section’s reference AnnData.</p></li>
+<li><p><cite>.var</cite>: Feature names associated with the imputed modality.</p></li>
+<li><p><cite>.obsm[‘spatial’]</cite>: Copied spatial coordinates (if present).</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html" class="btn btn-neutral float-left" title="COSIE.downstream_analysis.merge_clusters_to_new_ids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.downstream_analysis.plot_histology_clusters.html" class="btn btn-neutral float-right" title="COSIE.downstream_analysis.plot_histology_clusters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

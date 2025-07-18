@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.data_preprocessing.construct_metacell_data_dict &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.data_preprocessing.load_data" href="COSIE.data_preprocessing.load_data.html" />
+    <link rel="prev" title="COSIE.data_preprocessing.clr_normalize_each_cell" href="COSIE.data_preprocessing.clr_normalize_each_cell.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="COSIE.data_preprocessing.clr_normalize_each_cell.html">COSIE.data_preprocessing.clr_normalize_each_cell</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">COSIE.data_preprocessing.construct_metacell_data_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.data_preprocessing.load_data.html">COSIE.data_preprocessing.load_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.data_preprocessing.metacell_construction_optimized.html">COSIE.data_preprocessing.metacell_construction_optimized</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.data_preprocessing.preprocess_adata.html">COSIE.data_preprocessing.preprocess_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.data_preprocessing.reconstruct_metacell_to_original.html">COSIE.data_preprocessing.reconstruct_metacell_to_original</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+      <li class="breadcrumb-item active">COSIE.data_preprocessing.construct_metacell_data_dict</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cosie-data-preprocessing-construct-metacell-data-dict">
+<h1>COSIE.data_preprocessing.construct_metacell_data_dict<a class="headerlink" href="#cosie-data-preprocessing-construct-metacell-data-dict" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="COSIE.data_preprocessing.construct_metacell_data_dict">
+<span class="sig-name descname"><span class="pre">construct_metacell_data_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/data_preprocessing.html#construct_metacell_data_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.data_preprocessing.construct_metacell_data_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Apply metacell construction to all available AnnData objects in a multimodal dataset dictionary.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl>
+<dt>data_dict<span class="classifier">dict</span></dt><dd><p>A dictionary where each key is a modality name (e.g., <cite>‘RNA’</cite>, <cite>‘Protein’</cite>) and each value
+is a list of AnnData objects, one per tissue section. Each AnnData should contain:</p>
+<ul class="simple">
+<li><p><cite>.X</cite>: Expression or feature matrix (dense or sparse)</p></li>
+<li><p><cite>.obs</cite>, <cite>.var</cite>: Standard metadata</p></li>
+<li><p><cite>.obsm[‘spatial’]</cite>: 2D spatial coordinates</p></li>
+</ul>
+<p>If a modality is missing in a section, use <cite>None</cite> to indicate it.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>metacell_dict<span class="classifier">dict</span></dt><dd><p>A new dictionary with the same structure as <cite>data_dict</cite>, where each AnnData object has been replaced by its metacell-aggregated version, created using <cite>metacell_construction()</cite>. The modality and section alignment are preserved.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.data_preprocessing.clr_normalize_each_cell.html" class="btn btn-neutral float-left" title="COSIE.data_preprocessing.clr_normalize_each_cell" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.data_preprocessing.load_data.html" class="btn btn-neutral float-right" title="COSIE.data_preprocessing.load_data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

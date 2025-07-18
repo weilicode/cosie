@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.image_preprocessing &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">COSIE.image_preprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for COSIE.image_preprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+
+<span class="kn">import</span> <span class="nn">timm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">tifffile</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="kn">import</span> <span class="n">rescale</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageOps</span><span class="p">,</span> <span class="n">ImageChops</span>
+<span class="kn">from</span> <span class="nn">cv2</span> <span class="kn">import</span> <span class="n">findHomography</span><span class="p">,</span> <span class="n">RANSAC</span><span class="p">,</span> <span class="n">perspectiveTransform</span><span class="p">,</span> <span class="n">estimateAffinePartial2D</span>
+<span class="n">Image</span><span class="o">.</span><span class="n">MAX_IMAGE_PIXELS</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+
+<div class="viewcode-block" id="load_image">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.load_image.html#COSIE.image_preprocessing.load_image">[docs]</a>
+<span class="k">def</span> <span class="nf">load_image</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Efficiently load an image file and convert it to a NumPy array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Path to the image file. Supports common formats such as .png, .jpg, .tif.</span>
+<span class="sd">    </span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Whether to print log messages during the loading process. Default is True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    img : np.ndarray</span>
+<span class="sd">        A NumPy array representing the image. Shape is (H, W) for grayscale or (H, W, 3) for RGB images. The alpha channel is removed if present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;loading image...&#39;</span><span class="p">)</span>
+    <span class="n">Image</span><span class="o">.</span><span class="n">MAX_IMAGE_PIXELS</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">40</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># remove alpha channel</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Image loaded from </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="rescale_image">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.rescale_image.html#COSIE.image_preprocessing.rescale_image">[docs]</a>
+<span class="k">def</span> <span class="nf">rescale_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rescale an image by a given scale factor using `skimage.transform.rescale`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img : np.ndarray</span>
+<span class="sd">        Input image array. Can be either a 2D grayscale image of shape (H, W), or a 3D color image of shape (H, W, C).</span>
+<span class="sd">    </span>
+<span class="sd">    scale : float</span>
+<span class="sd">        Rescaling factor. The same scale is applied to both height and width dimensions. If the input is 3D, the channel dimension is preserved.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    img : np.ndarray</span>
+<span class="sd">        The rescaled image array. The output values are kept in the original range of the input (`preserve_range=True`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">img</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized image ndim&#39;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">rescale</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="save_jpg">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.save_jpg.html#COSIE.image_preprocessing.save_jpg">[docs]</a>
+<span class="k">def</span> <span class="nf">save_jpg</span><span class="p">(</span><span class="n">img_array</span><span class="p">,</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a NumPy array into a JPEG image and save it to disk.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img_array : np.ndarray</span>
+<span class="sd">        Input image as a NumPy array. The array should represent a grayscale or RGB image, and will be cast to `uint8` before saving.</span>
+<span class="sd">    </span>
+<span class="sd">    file_name : str</span>
+<span class="sd">        The name to save the image as. The `.jpg` extension will be automatically appended.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        The image is saved as a JPEG file at the specified location.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">img_array</span> <span class="o">=</span> <span class="n">img_array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
+    <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.jpg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;JPEG&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mkdir">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.mkdir.html#COSIE.image_preprocessing.mkdir">[docs]</a>
+<span class="k">def</span> <span class="nf">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the parent directory for a given file or directory path if it does not already exist.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        The full file path or directory path. The function will extract the parent directory and create it if it does not exist.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        The parent directory is created in place if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dirname</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_pickle">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.save_pickle.html#COSIE.image_preprocessing.save_pickle">[docs]</a>
+<span class="k">def</span> <span class="nf">save_pickle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save a Python object to a .pkl file using the `pickle` module.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : Any</span>
+<span class="sd">        The Python object to serialize (e.g., list, dict, NumPy array).</span>
+<span class="sd">    </span>
+<span class="sd">    filename : str</span>
+<span class="sd">        The full path to save the pickle file. If the parent directory does not exist,</span>
+<span class="sd">        it will be created automatically.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        The object is serialized and saved as a .pkl file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mkdir</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="load_pickle">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.load_pickle.html#COSIE.image_preprocessing.load_pickle">[docs]</a>
+<span class="k">def</span> <span class="nf">load_pickle</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a Python object from a .pkl file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        The full path of the pickle file to load.</span>
+<span class="sd">    </span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Whether to print a confirmation message upon successful loading. Default is True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : Any</span>
+<span class="sd">        The deserialized Python object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pickle loaded from </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="combine_mask">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.combine_mask.html#COSIE.image_preprocessing.combine_mask">[docs]</a>
+<span class="k">def</span> <span class="nf">combine_mask</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">mask_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Modify a grayscale image by applying a binary mask. All pixels in the input image</span>
+<span class="sd">    corresponding to white (255) pixels in the mask will be set to black (0).</span>
+<span class="sd">    This is useful when a specific region needs to be recovered as black based on a mask.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image_path : str</span>
+<span class="sd">        Path to the input grayscale image to be modified.</span>
+<span class="sd">    </span>
+<span class="sd">    mask_path : str</span>
+<span class="sd">        Path to the binary mask image. Must be the same size as the input image.</span>
+<span class="sd">    </span>
+<span class="sd">    output_path : str</span>
+<span class="sd">        Path to save the modified image.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        The modified image is saved to the specified output path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load images</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">)</span>  <span class="c1"># Ensure grayscale</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mask_path</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">)</span>  <span class="c1"># Ensure grayscale</span>
+
+    <span class="c1"># Ensure both images are the same size</span>
+    <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The base image and mask must have the same size.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert images to pixel data</span>
+    <span class="n">image_pixels</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">mask_pixels</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+    <span class="c1"># Modify the image based on the mask</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask_pixels</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">==</span> <span class="mi">255</span><span class="p">:</span>  <span class="c1"># If mask pixel is white</span>
+                <span class="n">image_pixels</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Set the corresponding base image pixel to black</span>
+
+    <span class="c1"># Save the modified image</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modified image saved to </span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="generate_pxl_location_from_mask">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.generate_pxl_location_from_mask.html#COSIE.image_preprocessing.generate_pxl_location_from_mask">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_pxl_location_from_mask</span><span class="p">(</span><span class="n">mask_image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract pixel and spatial coordinates of 16×16 superpixels whose top-left pixels</span>
+<span class="sd">    fall within the white (255) region of a binary mask.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mask_image : np.ndarray</span>
+<span class="sd">        A 2D binary mask array. Pixels with value 255 are considered valid, i.e., within the tissue or region of interest (ROI).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    filtered_coordinates : np.ndarray of shape (N, 2)</span>
+<span class="sd">        Pixel coordinates (in image space) of valid 16×16 superpixels. Each coordinate represents the top-left corner of a 16×16 block.</span>
+<span class="sd">        </span>
+<span class="sd">    spatial_location : np.ndarray of shape (N, 2)</span>
+<span class="sd">        Spatial locations obtained by dividing pixel coordinates by 16. Typically used for spatial indexing or grid-based embedding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_image</span> <span class="o">==</span> <span class="mi">255</span><span class="p">))</span>
+    <span class="n">pixel_coordinates</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pixels</span><span class="p">]</span>
+    <span class="n">filtered_coordinates</span> <span class="o">=</span> <span class="p">[(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pixel_coordinates</span> <span class="k">if</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">filtered_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">filtered_coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">spatial_location</span> <span class="o">=</span> <span class="n">filtered_coordinates</span><span class="o">//</span><span class="mi">16</span>
+    <span class="c1"># (y, x) y corresponds to height(row), x corresponds to width(col)</span>
+    <span class="k">return</span> <span class="n">filtered_coordinates</span><span class="p">,</span> <span class="n">spatial_location</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="PatchDataset">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.PatchDataset.html#COSIE.image_preprocessing.PatchDataset">[docs]</a>
+<span class="k">class</span> <span class="nc">PatchDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A PyTorch-compatible dataset for extracting 224×224 image patches centered at specified cell coordinates from a high-resolution RGB image.</span>
+
+<span class="sd">    Each patch is centered on a given pixel coordinate, padded if it falls near the edge</span>
+<span class="sd">    of the image, and normalized using standard ImageNet statistics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image : np.ndarray</span>
+<span class="sd">        Full-resolution RGB H&amp;E image of shape (H, W, 3).</span>
+<span class="sd">    </span>
+<span class="sd">    location : np.ndarray</span>
+<span class="sd">        Array of shape (N, 2) containing N pixel coordinates for cell centers.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dataset : PatchDataset</span>
+<span class="sd">        A PyTorch dataset object. Each item is a tuple (transformed_patch, coordinate), where `transformed_patch` is a normalized 3×224×224 tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>   <span class="c1"># location should be a n*2 numpy array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">(</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="p">(</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">)),</span>
+        <span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape_ori</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;shape_ori:&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">shape_ori</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_patches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_patches</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+
+        <span class="n">center_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">center_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">start_i</span><span class="p">,</span> <span class="n">start_j</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">center_i</span> <span class="o">-</span> <span class="mi">112</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">center_j</span> <span class="o">-</span> <span class="mi">112</span><span class="p">)</span>
+        <span class="n">end_i</span><span class="p">,</span> <span class="n">end_j</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape_ori</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">center_i</span> <span class="o">+</span> <span class="mi">112</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape_ori</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">center_j</span> <span class="o">+</span> <span class="mi">112</span><span class="p">)</span>
+        
+        <span class="n">patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">start_i</span><span class="p">:</span><span class="n">end_i</span><span class="p">,</span> <span class="n">start_j</span><span class="p">:</span><span class="n">end_j</span><span class="p">]</span>
+        
+        <span class="c1"># Pad if necessary to ensure 224x224 size</span>
+        <span class="k">if</span> <span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">224</span> <span class="ow">or</span> <span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">224</span><span class="p">:</span>
+            <span class="n">padded_patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">patch</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">padded_patch</span><span class="p">[(</span><span class="mi">224</span><span class="o">-</span><span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span><span class="p">:(</span><span class="mi">224</span><span class="o">-</span><span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                         <span class="p">(</span><span class="mi">224</span><span class="o">-</span><span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span><span class="p">:(</span><span class="mi">224</span><span class="o">-</span><span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="n">patch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">patch</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">padded_patch</span>
+
+        <span class="n">patch</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">patch</span><span class="p">),</span> <span class="p">(</span><span class="n">center_i</span><span class="p">,</span> <span class="n">center_j</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_model">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.create_model.html#COSIE.image_preprocessing.create_model">[docs]</a>
+<span class="k">def</span> <span class="nf">create_model</span><span class="p">(</span><span class="n">local_dir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create and load a pre-trained Vision Transformer (ViT-L/16) model from a HuggingFace-compatible checkpoint.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    local_dir : str</span>
+<span class="sd">        Path to the folder containing the pre-trained model weights (e.g., `pytorch_model.bin`).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : torch.nn.Module</span>
+<span class="sd">        A ViT-Large (patch16, img224) model from the `timm` library, without classification head or global pooling.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">timm</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span>
+        <span class="s2">&quot;vit_large_patch16_224&quot;</span><span class="p">,</span> 
+        <span class="n">img_size</span><span class="o">=</span><span class="mi">224</span><span class="p">,</span> 
+        <span class="n">patch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
+        <span class="n">init_values</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> 
+        <span class="n">num_classes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># This ensures no classification head</span>
+        <span class="n">global_pool</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="c1"># This removes global pooling</span>
+    <span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_dir</span><span class="p">,</span> <span class="s2">&quot;pytorch_model.bin&quot;</span><span class="p">),</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<span class="c1"># v2</span>
+<div class="viewcode-block" id="extract_features">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.extract_features.html#COSIE.image_preprocessing.extract_features">[docs]</a>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="c1"># “”&quot;Extract both 224-level and 16-level features.“”&quot;</span>
+    <span class="n">feature_emb</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">final_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward_intermediates</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">return_prefix_tokens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">local_emb</span> <span class="o">=</span> <span class="n">final_output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">patch_emb</span> <span class="o">=</span> <span class="n">local_emb</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">feature_emb</span><span class="p">,</span> <span class="n">patch_emb</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="image_feature_extraction">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.image_feature_extraction.html#COSIE.image_preprocessing.image_feature_extraction">[docs]</a>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">image_feature_extraction</span><span class="p">(</span>
+    <span class="n">he_image</span><span class="p">,</span> 
+    <span class="n">uni_local_dir</span><span class="p">,</span> 
+    <span class="n">cell_location</span><span class="p">,</span> 
+    <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda:0&#39;</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> 
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract image features at cell locations using a pretrained Vision Transformer (ViT) model</span>
+<span class="sd">    and save the output to disk as a pickle file.</span>
+
+<span class="sd">    The function loads a model via `create_model`, initializes a `PatchDataset` using the input</span>
+<span class="sd">    image and cell pixel locations, and for each patch extracts both global (224×224) and local</span>
+<span class="sd">    (16×16) features. These features are concatenated into a single representation per cell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    he_image : np.ndarray</span>
+<span class="sd">        RGB image of shape (H, W, 3).</span>
+<span class="sd">    </span>
+<span class="sd">    uni_local_dir : str</span>
+<span class="sd">        Path to the folder containing the pretrained model weights (e.g., `pytorch_model.bin`).</span>
+<span class="sd">    </span>
+<span class="sd">    cell_location : np.ndarray</span>
+<span class="sd">        An array of shape (N, 2) containing pixel coordinates for N cells.</span>
+<span class="sd">    </span>
+<span class="sd">    device : str, optional</span>
+<span class="sd">        Torch device to use for inference, e.g., `&quot;cuda:0&quot;`. Default is `&#39;cuda:0&#39;`.</span>
+<span class="sd">    </span>
+<span class="sd">    batch_size : int, optional</span>
+<span class="sd">        Batch size for feature extraction. Default is 128.</span>
+<span class="sd">    </span>
+<span class="sd">    num_workers : int, optional</span>
+<span class="sd">        Number of worker threads for the DataLoader. Default is 4.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        The extracted features are saved to disk as a pickle file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cell num:&#39;</span><span class="p">,</span><span class="n">cell_location</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">uni_local_dir</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finish loading model&#39;</span><span class="p">)</span>
+    
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    
+    
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">PatchDataset</span><span class="p">(</span><span class="n">he_image</span><span class="p">,</span> <span class="n">cell_location</span><span class="p">)</span>
+    <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">patch_embeddings</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">part_cnts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">positions</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))):</span>
+
+        <span class="n">patches</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batch </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of patches: </span><span class="si">{</span><span class="n">patches</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of positions[0]: </span><span class="si">{</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Content of positions[0][:10]: </span><span class="si">{</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Content of positions[1][:10]: </span><span class="si">{</span><span class="n">positions</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="n">feature_emb</span><span class="p">,</span> <span class="n">patch_emb</span> <span class="o">=</span> <span class="n">extract_features</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">patches</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of feature_emb: </span><span class="si">{</span><span class="n">feature_emb</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of patch_emb: </span><span class="si">{</span><span class="n">patch_emb</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Process each patch</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            
+            <span class="c1"># Extract features</span>
+            <span class="n">center_feature</span> <span class="o">=</span> <span class="n">feature_emb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Use the [CLS] token as the 224-level feature</span>
+            <span class="n">patch_feature</span> <span class="o">=</span> <span class="n">patch_emb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>  <span class="c1"># Use the center patch feature</span>
+            
+            <span class="c1"># Concatenate 224-level and 16-level features</span>
+            <span class="n">combined_feature</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">center_feature</span><span class="p">,</span> <span class="n">patch_feature</span><span class="p">])</span>
+            <span class="n">patch_embeddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">combined_feature</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+            
+
+    <span class="n">save_pickle</span><span class="p">(</span><span class="n">patch_embeddings</span><span class="p">,</span> <span class="s1">&#39;uni_embeddings.pickle&#39;</span><span class="p">)</span>  </div>
+
+
+
+
+
+
+<div class="viewcode-block" id="generate_homograph">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.generate_homograph.html#COSIE.image_preprocessing.generate_homograph">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_homograph</span><span class="p">(</span><span class="n">keypoints_src</span><span class="p">,</span> <span class="n">keypoints_dst</span><span class="p">,</span> <span class="n">transform_type</span><span class="o">=</span><span class="s2">&quot;rigid&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a geometric transformation matrix from source to destination keypoints,</span>
+<span class="sd">    using either rigid or affine transformation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    keypoints_src : np.ndarray</span>
+<span class="sd">        Source keypoints of shape (N, 2), e.g., from image A.</span>
+<span class="sd">    </span>
+<span class="sd">    keypoints_dst : np.ndarray</span>
+<span class="sd">        Destination keypoints of shape (N, 2), e.g., from image B.</span>
+<span class="sd">    </span>
+<span class="sd">    transform_type : str, optional</span>
+<span class="sd">        Type of transformation to apply. Must be one of {&quot;rigid&quot;, &quot;affine&quot;}.</span>
+<span class="sd">        </span>
+<span class="sd">        - &quot;rigid&quot;: Applies rotation and translation only.  </span>
+<span class="sd">        - &quot;affine&quot;: Allows for rotation, translation, and shearing/skewing.  </span>
+<span class="sd">        </span>
+<span class="sd">        Default is &quot;rigid&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    trans_mat : np.ndarray</span>
+<span class="sd">        The transformation matrix:</span>
+<span class="sd">        </span>
+<span class="sd">        - Shape is (2, 3) for &quot;rigid&quot; transforms.  </span>
+<span class="sd">        - Shape is (3, 3) for &quot;affine&quot; transforms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">transform_type</span> <span class="o">==</span> <span class="s2">&quot;affine&quot;</span><span class="p">:</span>
+        <span class="n">trans_mat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">findHomography</span><span class="p">(</span><span class="n">keypoints_src</span><span class="p">,</span> <span class="n">keypoints_dst</span><span class="p">,</span> <span class="n">RANSAC</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform_type</span> <span class="o">==</span> <span class="s2">&quot;rigid&quot;</span><span class="p">:</span>
+        <span class="n">trans_mat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">estimateAffinePartial2D</span><span class="p">(</span><span class="n">keypoints_src</span><span class="p">,</span> <span class="n">keypoints_dst</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">RANSAC</span><span class="p">)</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">trans_mat</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rotation_matrix</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>  <span class="c1"># Get the scale for x and y</span>
+        <span class="n">rotation_matrix_normalized</span> <span class="o">=</span> <span class="n">rotation_matrix</span> <span class="o">/</span> <span class="n">scale</span>  <span class="c1"># Remove scaling</span>
+        <span class="n">trans_mat</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">rotation_matrix_normalized</span>
+    <span class="k">return</span> <span class="n">trans_mat</span></div>
+
+
+<div class="viewcode-block" id="transform_coordinates">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.transform_coordinates.html#COSIE.image_preprocessing.transform_coordinates">[docs]</a>
+<span class="k">def</span> <span class="nf">transform_coordinates</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">homography_matrix</span><span class="p">,</span> <span class="n">transform_type</span><span class="o">=</span><span class="s2">&quot;affine&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a geometric transformation matrix (e.g., from `generate_homograph`) to 2D coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    coords : np.ndarray</span>
+<span class="sd">        Coordinates to be transformed, of shape (N, 2).</span>
+<span class="sd">    </span>
+<span class="sd">    homography_matrix : np.ndarray</span>
+<span class="sd">        The transformation matrix. Shape must be (2, 3) for &quot;rigid&quot; or (3, 3) for &quot;affine&quot;.</span>
+<span class="sd">    </span>
+<span class="sd">    transform_type : str, optional</span>
+<span class="sd">        The type of transformation to apply. Must be one of {&quot;rigid&quot;, &quot;affine&quot;},</span>
+<span class="sd">        and must match the shape of `homography_matrix`. Default is &quot;affine&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    transformed_coords : np.ndarray</span>
+<span class="sd">        Transformed 2D coordinates, with shape (N, 2).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">transform_type</span> <span class="o">==</span> <span class="s2">&quot;affine&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perspectiveTransform</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">homography_matrix</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">transform_type</span> <span class="o">==</span> <span class="s2">&quot;rigid&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">homography_matrix</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+
+
+
+<div class="viewcode-block" id="get_white_superpixel_centers">
+<a class="viewcode-back" href="../../api/COSIE.image_preprocessing.get_white_superpixel_centers.html#COSIE.image_preprocessing.get_white_superpixel_centers">[docs]</a>
+<span class="k">def</span> <span class="nf">get_white_superpixel_centers</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">superpixel_size</span><span class="o">=</span><span class="mi">16</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identify the center coordinates of superpixels that are entirely white (255) in a binary image.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image_path : str</span>
+<span class="sd">        Path to the binary image (grayscale) composed of superpixels.</span>
+
+<span class="sd">    superpixel_size : int, optional</span>
+<span class="sd">        Size (in pixels) of each square superpixel block. Default is 16.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    centers : list of tuple</span>
+<span class="sd">        List of (x, y) tuples representing the center coordinates of superpixels</span>
+<span class="sd">        that are fully white. Coordinates are in pixel units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Step 1: load image</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">centers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Step 2: visit all superpixels </span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">superpixel_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">superpixel_size</span><span class="p">):</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">superpixel_size</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="n">superpixel_size</span><span class="p">]</span>
+
+            <span class="c1"># Step 3: check if they are white(255)</span>
+            <span class="k">if</span> <span class="n">patch</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">superpixel_size</span><span class="p">,</span> <span class="n">superpixel_size</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">patch</span> <span class="o">==</span> <span class="mi">255</span><span class="p">):</span>
+                <span class="c1"># Step 4: return the center location of each filtered superpixel</span>
+                <span class="n">center_y</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">superpixel_size</span> <span class="o">//</span> <span class="mi">2</span>
+                <span class="n">center_x</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">superpixel_size</span> <span class="o">//</span> <span class="mi">2</span>
+                <span class="n">centers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">))</span>  <span class="c1"># x should be col, y should be row</span>
+
+    <span class="k">return</span> <span class="n">centers</span></div>
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

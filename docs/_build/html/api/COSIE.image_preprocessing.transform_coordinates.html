@@ -1,0 +1,169 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.image_preprocessing.transform_coordinates &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.image_preprocessing.PatchDataset" href="COSIE.image_preprocessing.PatchDataset.html" />
+    <link rel="prev" title="COSIE.image_preprocessing.save_pickle" href="COSIE.image_preprocessing.save_pickle.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.combine_mask.html">COSIE.image_preprocessing.combine_mask</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.create_model.html">COSIE.image_preprocessing.create_model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.extract_features.html">COSIE.image_preprocessing.extract_features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.generate_homograph.html">COSIE.image_preprocessing.generate_homograph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.generate_pxl_location_from_mask.html">COSIE.image_preprocessing.generate_pxl_location_from_mask</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.get_white_superpixel_centers.html">COSIE.image_preprocessing.get_white_superpixel_centers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.image_feature_extraction.html">COSIE.image_preprocessing.image_feature_extraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.load_image.html">COSIE.image_preprocessing.load_image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.load_pickle.html">COSIE.image_preprocessing.load_pickle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.mkdir.html">COSIE.image_preprocessing.mkdir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.rescale_image.html">COSIE.image_preprocessing.rescale_image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.save_jpg.html">COSIE.image_preprocessing.save_jpg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.save_pickle.html">COSIE.image_preprocessing.save_pickle</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">COSIE.image_preprocessing.transform_coordinates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.image_preprocessing.PatchDataset.html">COSIE.image_preprocessing.PatchDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+      <li class="breadcrumb-item active">COSIE.image_preprocessing.transform_coordinates</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cosie-image-preprocessing-transform-coordinates">
+<h1>COSIE.image_preprocessing.transform_coordinates<a class="headerlink" href="#cosie-image-preprocessing-transform-coordinates" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="COSIE.image_preprocessing.transform_coordinates">
+<span class="sig-name descname"><span class="pre">transform_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">homography_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'affine'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/image_preprocessing.html#transform_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.image_preprocessing.transform_coordinates" title="Link to this definition">¶</a></dt>
+<dd><p>Apply a geometric transformation matrix (e.g., from <cite>generate_homograph</cite>) to 2D coordinates.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>coords<span class="classifier">np.ndarray</span></dt><dd><p>Coordinates to be transformed, of shape (N, 2).</p>
+</dd>
+<dt>homography_matrix<span class="classifier">np.ndarray</span></dt><dd><p>The transformation matrix. Shape must be (2, 3) for “rigid” or (3, 3) for “affine”.</p>
+</dd>
+<dt>transform_type<span class="classifier">str, optional</span></dt><dd><p>The type of transformation to apply. Must be one of {“rigid”, “affine”},
+and must match the shape of <cite>homography_matrix</cite>. Default is “affine”.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>transformed_coords<span class="classifier">np.ndarray</span></dt><dd><p>Transformed 2D coordinates, with shape (N, 2).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.image_preprocessing.save_pickle.html" class="btn btn-neutral float-left" title="COSIE.image_preprocessing.save_pickle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.image_preprocessing.PatchDataset.html" class="btn btn-neutral float-right" title="COSIE.image_preprocessing.PatchDataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

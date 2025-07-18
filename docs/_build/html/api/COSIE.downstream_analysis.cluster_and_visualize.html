@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.downstream_analysis.cluster_and_visualize &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.downstream_analysis.cluster_and_visualize_superpixel" href="COSIE.downstream_analysis.cluster_and_visualize_superpixel.html" />
+    <link rel="prev" title="COSIE.downstream_analysis" href="COSIE.downstream_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">COSIE.downstream_analysis.cluster_and_visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.cluster_and_visualize_superpixel.html">COSIE.downstream_analysis.cluster_and_visualize_superpixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.create_normalized_adata.html">COSIE.downstream_analysis.create_normalized_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.highlight_joint_clusters_all_sections.html">COSIE.downstream_analysis.highlight_joint_clusters_all_sections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html">COSIE.downstream_analysis.merge_clusters_to_new_ids</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.perform_imputation.html">COSIE.downstream_analysis.perform_imputation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_histology_clusters.html">COSIE.downstream_analysis.plot_histology_clusters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison.html">COSIE.downstream_analysis.plot_marker_comparison</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison_superpixel.html">COSIE.downstream_analysis.plot_marker_comparison_superpixel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.prepare_image.html">COSIE.downstream_analysis.prepare_image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.relabel_clusters_sequentially.html">COSIE.downstream_analysis.relabel_clusters_sequentially</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html">COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html">COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+      <li class="breadcrumb-item active">COSIE.downstream_analysis.cluster_and_visualize</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cosie-downstream-analysis-cluster-and-visualize">
+<h1>COSIE.downstream_analysis.cluster_and_visualize<a class="headerlink" href="#cosie-downstream-analysis-cluster-and-visualize" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="COSIE.downstream_analysis.cluster_and_visualize">
+<span class="sig-name descname"><span class="pre">cluster_and_visualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">final_embeddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spatial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cluster_labels'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tab20'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'original'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swap_xy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/downstream_analysis.html#cluster_and_visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.downstream_analysis.cluster_and_visualize" title="Link to this definition">¶</a></dt>
+<dd><p>Cluster cell embeddings and visualize the results for each tissue section at the spot level.
+Supports both joint and per-section clustering modes, and offers flexible
+visualization controls (axis flip, equal scaling, saving, etc.).</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>final_embeddings<span class="classifier">dict</span></dt><dd><p>A dictionary mapping section names (e.g., <cite>‘s1’</cite>, <cite>‘s2’</cite>, …) to 2D NumPy arrays of shape (n_cells, latent_dim), representing cell embeddings for each section.</p>
+</dd>
+<dt>data_dict<span class="classifier">dict</span></dt><dd><p>A dictionary where each key is a modality (e.g., <cite>‘RNA’</cite>, <cite>‘Protein’</cite>) and each value is a list of AnnData objects, one per tissue section. If a modality is missing in a section, use <cite>None</cite> as a placeholder.</p>
+</dd>
+<dt>n_clusters<span class="classifier">int</span></dt><dd><p>Number of clusters to assign using k-means.</p>
+</dd>
+<dt>mode<span class="classifier">str, optional</span></dt><dd><p>Clustering mode. Must be one of {‘joint’, ‘independent’}.</p>
+<ul class="simple">
+<li><p>‘joint’: Cluster all sections together.</p></li>
+<li><p>‘independent’: Cluster each section separately. Default is ‘joint’.</p></li>
+</ul>
+</dd>
+<dt>vis_basis<span class="classifier">str, optional</span></dt><dd><p>The key in <cite>.obsm</cite> to use for visualization (e.g., <cite>‘spatial’</cite>). Default is <cite>‘spatial’</cite>.</p>
+</dd>
+<dt>cluster_key<span class="classifier">str, optional</span></dt><dd><p>Column name in <cite>.obs</cite> to store cluster assignments. Default is <cite>‘cluster_labels’</cite>.</p>
+</dd>
+<dt>random_state<span class="classifier">int, optional</span></dt><dd><p>Random seed for k-means reproducibility. Default is 0.</p>
+</dd>
+<dt>s<span class="classifier">int, optional</span></dt><dd><p>Dot size in scatter plots. Default is 50.</p>
+</dd>
+<dt>alpha<span class="classifier">float, optional</span></dt><dd><p>Point transparency (0 to 1). Default is 0.9.</p>
+</dd>
+<dt>colormap<span class="classifier">str, optional</span></dt><dd><p>Matplotlib colormap name for cluster coloring. Default is <cite>‘tab20’</cite>.</p>
+</dd>
+<dt>plot_style<span class="classifier">str, optional</span></dt><dd><p>Must be one of {‘equal’, ‘original’}.</p>
+<ul class="simple">
+<li><p>‘equal’: Enforce equal axis aspect ratio.</p></li>
+<li><p>‘original’: Retain raw coordinate scale. Default is <cite>‘original’</cite>.</p></li>
+</ul>
+</dd>
+<dt>swap_xy<span class="classifier">bool, optional</span></dt><dd><p>If True, swap x and y axes in the scatter plot. Default is False.</p>
+</dd>
+<dt>invert_x<span class="classifier">bool, optional</span></dt><dd><p>If True, invert the x-axis. Default is False.</p>
+</dd>
+<dt>invert_y<span class="classifier">bool, optional</span></dt><dd><p>If True, invert the y-axis. Default is False.</p>
+</dd>
+<dt>save_path<span class="classifier">str or None, optional</span></dt><dd><p>If provided, save the figures using this prefix. Individual files will be saved for each section. Default is None (no saving).</p>
+</dd>
+<dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Resolution of saved figures in DPI (dots per inch). Default is 300.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>cluster_labels<span class="classifier">dict</span></dt><dd><p>A dictionary mapping section IDs to arrays of assigned cluster labels.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.downstream_analysis.html" class="btn btn-neutral float-left" title="COSIE.downstream_analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.downstream_analysis.cluster_and_visualize_superpixel.html" class="btn btn-neutral float-right" title="COSIE.downstream_analysis.cluster_and_visualize_superpixel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

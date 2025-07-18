@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial - Image feature extraction &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial of SPOTS data" href="1_Tutorial_of_SPOTS.html" />
+    <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial - Image feature extraction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Setup">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Load-image-(B-cell-lymphoma-as-example)">Load image (B-cell lymphoma as example)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Input-the-mask-file">Input the mask file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Extract-Image-Features-using-UNI">Extract Image Features using UNI</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#COSIE-provides-a-function-image_feature_extraction-to-extract-features-from-H&amp;E-images.">COSIE provides a function <code class="docutils literal notranslate"><span class="pre">image_feature_extraction</span></code> to extract features from H&amp;E images.</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Load-image-feature">Load image feature</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Perform-clustering-and-visualization">Perform clustering and visualization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="1_Tutorial_of_SPOTS.html">Tutorial of SPOTS data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2_Tutorial_of_10x_Tonsil_integration.html">Tutorial of 10x Tonsil spatial CITE-seq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial1_Periodontal%28VisiumHD_CODEX%29.html">Tutorial 1 - Periodontal data (Visium HD + CODEX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial3_Mouse_striatum%28Spatial_Visium_MALDI%29.html">Tutorial 3 - Mouse striatum (Spatial Visium-MALDI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html">Tutorial 6 - Gastric cancer (Visium + COMET)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html">Tutorial 7 - Lung cancer (Spatial CITE-seq)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial8_Mouse_spleen%28SPOTS%29.html">Tutorial 8 - Mouse spleen (SPOTS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial9_LUAD_TCGA.html">Tutorial 9 - LUAD TCGA integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial10_B_cell_lymphoma%28CosMx_CODEX%29.html">Tutorial 10 - B cell lymphoma (CosMx + CODEX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial11_Tonsil%28Spatial_CITE_seq%29.html">Tutorial 11 - Tonsil (Spatial CITE-seq)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Tutorial - Image feature extraction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Tutorial---Image-feature-extraction">
+<h1>Tutorial - Image feature extraction<a class="headerlink" href="#Tutorial---Image-feature-extraction" title="Link to this heading">¶</a></h1>
+<section id="Setup">
+<h2>Setup<a class="headerlink" href="#Setup" title="Link to this heading">¶</a></h2>
+<p>This tutorial should be placed in the same directory as the COSIE model package.</p>
+<p>COSIE extracts superpixel-level image features using a hierarchical strategy based on the <a class="reference external" href="https://github.com/mahmoodlab/UNI">UNI</a> foundation model.</p>
+<p>To proceed, users should first obtain access to the pretrained UNI model.</p>
+<ul class="simple">
+<li><p>GitHub repository: <a class="reference external" href="https://github.com/mahmoodlab/UNI">https://github.com/mahmoodlab/UNI</a></p></li>
+<li><p>Hugging Face model: <a class="reference external" href="https://huggingface.co/MahmoodLab/UNI">https://huggingface.co/MahmoodLab/UNI</a></p></li>
+</ul>
+<p>Example images for this tutorial can be downloaded from: <a class="reference external" href="https://drive.google.com/drive/folders/17ZkFsz29eI6xrBveDXKhnslt1_j0L5lX?usp=sharing">https://drive.google.com/drive/folders/17ZkFsz29eI6xrBveDXKhnslt1_j0L5lX?usp=sharing</a></p>
+<p>After downloading, images should be placed in the same directory as this tutorial script.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="kn">from</span> <span class="nn">COSIE.image_preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">COSIE.downstream_analysis</span> <span class="kn">import</span> <span class="n">cluster_and_visualize_superpixel</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/weili97/miniconda3/envs/py39/lib/python3.9/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div></div>
+</div>
+</section>
+<section id="Load-image-(B-cell-lymphoma-as-example)">
+<h2>Load image (B-cell lymphoma as example)<a class="headerlink" href="#Load-image-(B-cell-lymphoma-as-example)" title="Link to this heading">¶</a></h2>
+<p>The resolution of this example image is 0.5 microns per pixel.</p>
+<p>Users may optionally rescale their images using the <code class="docutils literal notranslate"><span class="pre">rescale_image</span></code> function in the <code class="docutils literal notranslate"><span class="pre">image_preprocessing</span></code> module.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">he_image</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="s1">&#39;HE.jpg&#39;</span><span class="p">)</span>
+<span class="n">he_image</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loading image...
+Image loaded from HE.jpg
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(4000, 4000, 3)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">he_image</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Tutorial_of_image_feature_extraction_6_0.png" src="../_images/notebooks_Tutorial_of_image_feature_extraction_6_0.png" />
+</div>
+</div>
+</section>
+<section id="Input-the-mask-file">
+<h2>Input the mask file<a class="headerlink" href="#Input-the-mask-file" title="Link to this heading">¶</a></h2>
+<p>The mask file was generated using customized algorithm <strong>HistoSweep</strong>, and it can also be created using image editing software such as <strong>GIMP</strong>.</p>
+<p>Only the white 16×16 superpixels in the mask will be retained, and COSIE will extract image features exclusively from these superpixels.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;Image_mask.png&#39;</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+<span class="n">mask_image</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(4000, 4000)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Tutorial_of_image_feature_extraction_10_0.png" src="../_images/notebooks_Tutorial_of_image_feature_extraction_10_0.png" />
+</div>
+</div>
+<p>Generate the pixel locations of valid 16×16 superpixels.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span> <span class="o">=</span> <span class="n">get_white_superpixel_centers</span><span class="p">(</span><span class="s1">&#39;Image_mask.png&#39;</span><span class="p">)</span>
+<span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span>
+<span class="n">centers</span> <span class="o">=</span> <span class="n">centers</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="n">spatial_location</span> <span class="o">=</span> <span class="p">(</span><span class="n">centers</span> <span class="o">-</span> <span class="mi">8</span><span class="p">)</span> <span class="o">//</span> <span class="mi">16</span>
+<span class="n">spatial_location</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Find </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span><span class="si">}</span><span class="s2"> superpixels&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Find 29398 superpixels
+</pre></div></div>
+</div>
+</section>
+<section id="Extract-Image-Features-using-UNI">
+<h2>Extract Image Features using UNI<a class="headerlink" href="#Extract-Image-Features-using-UNI" title="Link to this heading">¶</a></h2>
+<section id="COSIE-provides-a-function-image_feature_extraction-to-extract-features-from-H&amp;E-images.">
+<h3>COSIE provides a function <code class="docutils literal notranslate"><span class="pre">image_feature_extraction</span></code> to extract features from H&amp;E images.<a class="headerlink" href="#COSIE-provides-a-function-image_feature_extraction-to-extract-features-from-H&E-images." title="Link to this heading">¶</a></h3>
+<section id="Required-Inputs">
+<h4>Required Inputs<a class="headerlink" href="#Required-Inputs" title="Link to this heading">¶</a></h4>
+<ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">he_image</span></code>:</div>
+<div class="line">The input H&amp;E image, provided as a NumPy array of shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> representing an RGB image.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">uni_local_dir</span></code>:</div>
+<div class="line">Path to the directory containing the pretrained UNI model weights, e.g., <code class="docutils literal notranslate"><span class="pre">pytorch_model.bin</span></code>.</div>
+<div class="line">After obtaining UNI access, this file should be available locally.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cell_location</span></code>:</div>
+<div class="line">An array of shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">2)</span></code> containing the pixel coordinates <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> for superpixel centers. COSIE will extract features centered around these coordinates.</div>
+</div>
+</li>
+</ul>
+</section>
+<section id="Optional-Parameters">
+<h4>Optional Parameters<a class="headerlink" href="#Optional-Parameters" title="Link to this heading">¶</a></h4>
+<ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">device</span></code>:</div>
+<div class="line">The device used for inference. Use <code class="docutils literal notranslate"><span class="pre">'cuda:0'</span></code> for GPU inference or <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code> if no GPU is available.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">batch_size</span></code>:</div>
+<div class="line">The batch size used during feature extraction.</div>
+</div>
+</li>
+</ul>
+<p>After training, a file named <code class="docutils literal notranslate"><span class="pre">UNI_embeddings.pkl</span></code> will be saved in the same directory.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uni_local_dir</span> <span class="o">=</span> <span class="s1">&#39;../UNI/assets/ckpts/vit_large_patch16_224.dinov2.uni_mass100k/&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_feature_extraction</span><span class="p">(</span><span class="n">he_image</span><span class="p">,</span> <span class="n">uni_local_dir</span><span class="p">,</span> <span class="n">centers</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cell num: 29398
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/weili97/aa_Final_version_COSIE/COSIE/image_preprocessing.py:320: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don&#39;t have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  model.load_state_dict(torch.load(os.path.join(local_dir, &#34;pytorch_model.bin&#34;), map_location=&#34;cpu&#34;), strict=False)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Finish loading model
+shape_ori: [4000 4000]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+  0%|                                                   | 0/230 [00:00&lt;?, ?it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Batch 0:
+Shape of patches: torch.Size([128, 3, 224, 224])
+Shape of positions[0]: torch.Size([128])
+Content of positions[0][:10]: tensor([520, 520, 520, 520, 520, 520, 520, 520, 520, 520])
+Content of positions[1][:10]: tensor([1896, 1912, 1928, 2088, 2104, 2168, 2184, 2248, 2264, 2280])
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+  0%|▏                                          | 1/230 [00:02&lt;10:22,  2.72s/it]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Shape of feature_emb: torch.Size([128, 197, 1024])
+Shape of patch_emb: torch.Size([128, 1024, 14, 14])
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|█████████████████████████████████████████| 230/230 [06:54&lt;00:00,  1.80s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+uni_embeddings.pickle
+</pre></div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="Load-image-feature">
+<h2>Load image feature<a class="headerlink" href="#Load-image-feature" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_feature</span> <span class="o">=</span> <span class="n">load_pickle</span><span class="p">(</span><span class="s1">&#39;uni_embeddings.pickle&#39;</span><span class="p">)</span>
+<span class="n">image_feature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_feature</span><span class="p">)</span>
+<span class="n">image_feature</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Pickle loaded from uni_embeddings.pickle
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(29398, 2048)
+</pre></div></div>
+</div>
+</section>
+<section id="Perform-clustering-and-visualization">
+<h2>Perform clustering and visualization<a class="headerlink" href="#Perform-clustering-and-visualization" title="Link to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">image_feature_pca</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">image_feature</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata_img</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">image_feature_pca</span><span class="p">)</span>
+<span class="n">adata_img</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;spatial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial_location</span>
+
+<span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;HE&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">adata_img</span><span class="p">]}</span>
+<span class="n">img_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;s1&#39;</span><span class="p">:</span><span class="n">image_feature_pca</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cluster_label</span> <span class="o">=</span> <span class="n">cluster_and_visualize_superpixel</span><span class="p">(</span><span class="n">img_data</span><span class="p">,</span>
+                                                 <span class="n">data_dict</span><span class="p">,</span>
+                                                 <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                                                 <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;independent&quot;</span><span class="p">,</span>
+                                                 <span class="n">vis_basis</span><span class="o">=</span><span class="s2">&quot;spatial&quot;</span><span class="p">,)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Perform independent clustering...
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Tutorial_of_image_feature_extraction_22_1.png" src="../_images/notebooks_Tutorial_of_image_feature_extraction_22_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="1_Tutorial_of_SPOTS.html" class="btn btn-neutral float-right" title="Tutorial of SPOTS data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

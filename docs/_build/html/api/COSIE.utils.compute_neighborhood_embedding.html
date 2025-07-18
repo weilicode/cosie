@@ -1,0 +1,163 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.utils.compute_neighborhood_embedding &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="COSIE.utils.construct_knn_graph_hnsw" href="COSIE.utils.construct_knn_graph_hnsw.html" />
+    <link rel="prev" title="COSIE.utils.compute_knn_graph" href="COSIE.utils.compute_knn_graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="COSIE.html">COSIE</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="COSIE.COSIE_framework.html">COSIE.COSIE_framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.configure.html">COSIE.configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.data_preprocessing.html">COSIE.data_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.downstream_analysis.html">COSIE.downstream_analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.image_preprocessing.html">COSIE.image_preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.linkage_construction.html">COSIE.linkage_construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.loss.html">COSIE.loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="COSIE.model_component.html">COSIE.model_component</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="COSIE.utils.html">COSIE.utils</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="COSIE.utils.compute_knn_graph.html">COSIE.utils.compute_knn_graph</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">COSIE.utils.compute_neighborhood_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.utils.construct_knn_graph_hnsw.html">COSIE.utils.construct_knn_graph_hnsw</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.utils.nn_approx.html">COSIE.utils.nn_approx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.utils.setup_seed.html">COSIE.utils.setup_seed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.html">COSIE</a></li>
+          <li class="breadcrumb-item"><a href="COSIE.utils.html">COSIE.utils</a></li>
+      <li class="breadcrumb-item active">COSIE.utils.compute_neighborhood_embedding</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cosie-utils-compute-neighborhood-embedding">
+<h1>COSIE.utils.compute_neighborhood_embedding<a class="headerlink" href="#cosie-utils-compute-neighborhood-embedding" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="COSIE.utils.compute_neighborhood_embedding">
+<span class="sig-name descname"><span class="pre">compute_neighborhood_embedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_index_spatial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/utils.html#compute_neighborhood_embedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.utils.compute_neighborhood_embedding" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the neighborhood embedding of each cell based on its spatial k-nearest neighbor graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
+</dd>
+</dl>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>edge_index_spatial<span class="classifier">torch.Tensor</span></dt><dd><p>A tensor of shape (2, num_edges), where each column represents a directed edge from source node to target node in the spatial graph.</p>
+</dd>
+<dt>embedding_matrix<span class="classifier">torch.Tensor</span></dt><dd><p>A tensor of shape (n_cells, dim) representing the embedding of each cell.</p>
+</dd>
+<dt>device<span class="classifier">torch.device</span></dt><dd><p>The computation device, e.g., <cite>torch.device(‘cuda’)</cite> or <cite>torch.device(‘cpu’)</cite>.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>neighborhood_embedding_matrix<span class="classifier">torch.Tensor</span></dt><dd><p>A tensor of shape (n_cells, dim) representing the average of each cell’s neighbors’ embeddings.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="COSIE.utils.compute_knn_graph.html" class="btn btn-neutral float-left" title="COSIE.utils.compute_knn_graph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="COSIE.utils.construct_knn_graph_hnsw.html" class="btn btn-neutral float-right" title="COSIE.utils.construct_knn_graph_hnsw" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

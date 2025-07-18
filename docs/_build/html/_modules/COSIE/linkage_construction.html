@@ -1,0 +1,848 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSIE.linkage_construction &mdash; COSIE 1.0, 2025-04 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=9b90a8f0" />
+
+  
+      <script src="../../_static/documentation_options.js?v=59fcc1ed"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            COSIE
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">COSIE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">COSIE.linkage_construction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for COSIE.linkage_construction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">nn_approx</span>
+
+<div class="viewcode-block" id="perform_strong_linkage_knn">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.perform_strong_linkage_knn.html#COSIE.linkage_construction.perform_strong_linkage_knn">[docs]</a>
+<span class="k">def</span> <span class="nf">perform_strong_linkage_knn</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct triplet pairs between two sections of the same modality using symmetric KNN-based linkage.</span>
+
+<span class="sd">    This function is designed to identify strong linkages between shared-modality data across two tissue sections. For each anchor cell, a positive sample is selected from the other section, and a negative sample is randomly selected from the same section as the anchor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data1 : np.ndarray</span>
+<span class="sd">        Feature matrix of dataset 1, of shape (n1, d).</span>
+<span class="sd">    data2 : np.ndarray</span>
+<span class="sd">        Feature matrix of dataset 2, of shape (n2, d).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    triplets : np.ndarray</span>
+<span class="sd">        An array of shape (n1 + n2, 3), where each row contains:</span>
+<span class="sd">        </span>
+<span class="sd">        - anchor index  </span>
+<span class="sd">        - positive index (from the other section via KNN)  </span>
+<span class="sd">        - negative index (randomly chosen from the same section as anchor)</span>
+
+<span class="sd">        Indices are in concatenated form:</span>
+<span class="sd">        </span>
+<span class="sd">        - `[0, ..., n1 - 1]` for data1  </span>
+<span class="sd">        - `[n1, ..., n1 + n2 - 1]` for data2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n2</span> <span class="o">=</span> <span class="n">data2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># data1 → data2 </span>
+    <span class="n">anchor1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+    <span class="n">pos1</span> <span class="o">=</span> <span class="n">nn_approx</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">pos1</span> <span class="o">+=</span> <span class="n">n1</span>  
+    <span class="n">pair1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">anchor1</span><span class="p">,</span> <span class="n">pos1</span><span class="p">))</span>
+
+    <span class="c1"># data2 → data1</span>
+    <span class="n">anchor2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span> <span class="o">+</span> <span class="n">n1</span>
+    <span class="n">pos2</span> <span class="o">=</span> <span class="n">nn_approx</span><span class="p">(</span><span class="n">data2</span><span class="p">,</span> <span class="n">data1</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">pair2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">anchor2</span><span class="p">,</span> <span class="n">pos2</span><span class="p">))</span>
+
+    <span class="c1"># combine</span>
+    <span class="n">pair</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># generate negative partner </span>
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">negatives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span>
+
+    <span class="n">mask1</span> <span class="o">=</span> <span class="n">anchors</span> <span class="o">&lt;</span> <span class="n">n1</span> 
+    <span class="n">negatives</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="o">~</span><span class="n">mask1</span>  
+    <span class="n">negatives</span><span class="p">[</span><span class="n">mask2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span> <span class="o">+</span> <span class="n">n1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask2</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">triplets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">pair</span><span class="p">,</span> <span class="n">negatives</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">triplets</span></div>
+
+
+
+
+<div class="viewcode-block" id="load_protein_gene_mapping">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.load_protein_gene_mapping.html#COSIE.linkage_construction.load_protein_gene_mapping">[docs]</a>
+<span class="k">def</span> <span class="nf">load_protein_gene_mapping</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load relationships between proteins and their associated genes. </span>
+<span class="sd">    This function reads a CSV file (Protein_gene_relationship.csv) containing curated protein-to-gene mappings and returns a dictionary used for weak linkage construction. </span>
+<span class="sd">    Users may also customize the CSV file to suit their own dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    protein_to_gene : dict</span>
+<span class="sd">        A dictionary mapping each protein name (lowercased `str`) to a `set` of associated gene names (also lowercased `str`). </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;Protein_gene_relationship.csv&#39;</span>  
+    <span class="n">mapping_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
+    <span class="n">protein_to_gene</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mapping_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">curr_protein_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Protein name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> 
+        <span class="n">genes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;RNA name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notna</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;RNA name&quot;</span><span class="p">])</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">curr_protein_name</span> <span class="ow">in</span> <span class="n">protein_to_gene</span><span class="p">:</span>
+            <span class="n">protein_to_gene</span><span class="p">[</span><span class="n">curr_protein_name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">genes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">protein_to_gene</span><span class="p">[</span><span class="n">curr_protein_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">gene</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">genes</span><span class="p">}</span>
+    
+    <span class="k">return</span> <span class="n">protein_to_gene</span></div>
+
+
+
+
+<div class="viewcode-block" id="perform_weak_linkage_knn">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.perform_weak_linkage_knn.html#COSIE.linkage_construction.perform_weak_linkage_knn">[docs]</a>
+<span class="k">def</span> <span class="nf">perform_weak_linkage_knn</span><span class="p">(</span><span class="n">adata1</span><span class="p">,</span> <span class="n">adata2</span><span class="p">,</span> <span class="n">modality1</span><span class="p">,</span> <span class="n">modality2</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="mi">3000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct weak linkage triplet pairs between two datasets of different but biologically related modalities.</span>
+
+<span class="sd">    This function performs symmetric nearest neighbor search using a shared feature space</span>
+<span class="sd">    derived from overlapping features (e.g., shared genes, or mapped protein-gene pairs).</span>
+<span class="sd">    For each anchor cell, a positive cell is selected from the other dataset (opposite modality),</span>
+<span class="sd">    and a negative cell is randomly selected from the same modality.</span>
+
+<span class="sd">    - For RNA-protein matching, a curated mapping is loaded via `load_protein_gene_mapping()`.</span>
+<span class="sd">    - For other epigenomic or transcriptomic modalities, shared features are determined by</span>
+<span class="sd">      intersecting `.var_names`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata1 : AnnData</span>
+<span class="sd">        AnnData object for dataset 1.</span>
+<span class="sd">    </span>
+<span class="sd">    adata2 : AnnData</span>
+<span class="sd">        AnnData object for dataset 2.</span>
+<span class="sd">    </span>
+<span class="sd">    modality1 : str</span>
+<span class="sd">        Modality type of `adata1`. Must be one of:</span>
+<span class="sd">        {&#39;RNA&#39;, &#39;RNA_panel2&#39;, &#39;Protein&#39;, &#39;H3K27me3&#39;, &#39;H3K27ac&#39;, &#39;ATAC&#39;, &#39;H3K4me3&#39;}.</span>
+<span class="sd">    </span>
+<span class="sd">    modality2 : str</span>
+<span class="sd">        Modality type of `adata2`. Must be one of:</span>
+<span class="sd">        {&#39;RNA&#39;, &#39;RNA_panel2&#39;, &#39;Protein&#39;, &#39;H3K27me3&#39;, &#39;H3K27ac&#39;, &#39;ATAC&#39;, &#39;H3K4me3&#39;}.</span>
+<span class="sd">    </span>
+<span class="sd">    num_hvg : int, optional</span>
+<span class="sd">        Number of highly variable features to retain for feature matching.</span>
+<span class="sd">        Default is 3000.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    triplets : np.ndarray</span>
+<span class="sd">        An array of shape (n1 + n2, 3), where each row represents:</span>
+<span class="sd">        </span>
+<span class="sd">        - anchor index  </span>
+<span class="sd">        - positive index (from the other section via KNN)  </span>
+<span class="sd">        - negative index (randomly chosen from the same section as anchor)</span>
+
+
+<span class="sd">        Indices are in concatenated form:</span>
+<span class="sd">        </span>
+<span class="sd">        - `[0, ..., n1 - 1]` for data1  </span>
+<span class="sd">        - `[n1, ..., n1 + n2 - 1]` for data2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">adata1_tmp</span> <span class="o">=</span> <span class="n">adata1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">adata2_tmp</span> <span class="o">=</span> <span class="n">adata2</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">adata1_tmp</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
+    <span class="n">adata2_tmp</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">select_hvg</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">modality</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">num_hvg</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Selecting </span><span class="si">{</span><span class="n">num_hvg</span><span class="si">}</span><span class="s1"> HVGs for </span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> genes for linkage construction&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">modality</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RNA&#39;</span><span class="p">,</span> <span class="s1">&#39;RNA_panel2&#39;</span><span class="p">]:</span>
+                <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="n">num_hvg</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="s2">&quot;seurat_v3&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="n">num_hvg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">adata</span><span class="p">[:,</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">adata</span>  
+
+    <span class="n">adata1_tmp</span> <span class="o">=</span> <span class="n">select_hvg</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="p">,</span> <span class="n">modality1</span><span class="p">)</span>
+    <span class="n">adata2_tmp</span> <span class="o">=</span> <span class="n">select_hvg</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="p">,</span> <span class="n">modality2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">modality1</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RNA&#39;</span><span class="p">,</span> <span class="s1">&#39;RNA_panel2&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">modality2</span> <span class="o">==</span> <span class="s2">&quot;Protein&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">modality1</span> <span class="o">==</span> <span class="s2">&quot;Protein&quot;</span> <span class="ow">and</span> <span class="n">modality2</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RNA&#39;</span><span class="p">,</span> <span class="s1">&#39;RNA_panel2&#39;</span><span class="p">]):</span>
+
+        <span class="c1"># Load the pre-defined gene-protein relationship</span>
+        <span class="n">protein_to_gene</span> <span class="o">=</span> <span class="n">load_protein_gene_mapping</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">modality1</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RNA&#39;</span><span class="p">,</span> <span class="s1">&#39;RNA_panel2&#39;</span><span class="p">]:</span>
+            <span class="n">adata_rna</span><span class="p">,</span> <span class="n">adata_protein</span> <span class="o">=</span> <span class="n">adata1_tmp</span><span class="p">,</span> <span class="n">adata2_tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">adata_rna</span><span class="p">,</span> <span class="n">adata_protein</span> <span class="o">=</span> <span class="n">adata2_tmp</span><span class="p">,</span> <span class="n">adata1_tmp</span>
+
+        <span class="n">rna_var_names_casefold</span> <span class="o">=</span> <span class="p">{</span><span class="n">gene</span><span class="o">.</span><span class="n">casefold</span><span class="p">():</span> <span class="n">gene</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">adata_rna</span><span class="o">.</span><span class="n">var_names</span><span class="p">}</span>
+        <span class="n">rna_protein_correspondence</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">protein_name</span> <span class="ow">in</span> <span class="n">adata_protein</span><span class="o">.</span><span class="n">var_names</span><span class="p">:</span>
+            <span class="n">normalized_protein_name</span> <span class="o">=</span> <span class="n">protein_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">normalized_protein_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">protein_to_gene</span><span class="p">:</span>
+                <span class="k">continue</span>  
+
+            <span class="n">curr_rna_names</span> <span class="o">=</span> <span class="n">protein_to_gene</span><span class="p">[</span><span class="n">normalized_protein_name</span><span class="p">]</span>  
+
+            <span class="k">for</span> <span class="n">rna_name</span> <span class="ow">in</span> <span class="n">curr_rna_names</span><span class="p">:</span>
+                <span class="n">normalized_rna_name</span> <span class="o">=</span> <span class="n">rna_name</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> 
+
+                <span class="k">if</span> <span class="n">normalized_rna_name</span> <span class="ow">in</span> <span class="n">rna_var_names_casefold</span><span class="p">:</span>
+                    <span class="n">matched_rna_name</span> <span class="o">=</span> <span class="n">rna_var_names_casefold</span><span class="p">[</span><span class="n">normalized_rna_name</span><span class="p">]</span> 
+                    <span class="n">rna_protein_correspondence</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">matched_rna_name</span><span class="p">,</span> <span class="n">protein_name</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rna_protein_correspondence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No RNA-Protein matches found. Check if RNA and protein names exist in the dataset and mapping file.&quot;</span><span class="p">)</span>
+        <span class="n">rna_protein_correspondence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rna_protein_correspondence</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of overlapping features: </span><span class="si">{</span><span class="n">rna_protein_correspondence</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">adata_rna</span> <span class="o">=</span> <span class="n">adata_rna</span><span class="p">[:,</span> <span class="n">rna_protein_correspondence</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">adata_protein</span> <span class="o">=</span> <span class="n">adata_protein</span><span class="p">[:,</span> <span class="n">rna_protein_correspondence</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">modality1</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RNA&#39;</span><span class="p">,</span> <span class="s1">&#39;RNA_panel2&#39;</span><span class="p">]:</span>
+            <span class="n">adata1_tmp</span><span class="p">,</span> <span class="n">adata2_tmp</span> <span class="o">=</span> <span class="n">adata_rna</span><span class="p">,</span> <span class="n">adata_protein</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">adata1_tmp</span><span class="p">,</span> <span class="n">adata2_tmp</span> <span class="o">=</span> <span class="n">adata_protein</span><span class="p">,</span> <span class="n">adata_rna</span>
+
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">overlap_features</span> <span class="o">=</span> <span class="n">adata1_tmp</span><span class="o">.</span><span class="n">var_names</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="o">.</span><span class="n">var_names</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of overlapping features: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">overlap_features</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap_features</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No overlapping features found between </span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">modality2</span><span class="si">}</span><span class="s2"> datasets.&quot;</span><span class="p">)</span>
+    
+        <span class="n">adata1_tmp</span> <span class="o">=</span> <span class="n">adata1_tmp</span><span class="p">[:,</span> <span class="n">overlap_features</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">adata2_tmp</span> <span class="o">=</span> <span class="n">adata2_tmp</span><span class="p">[:,</span> <span class="n">overlap_features</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting adata1_tmp.X from sparse to dense...&quot;</span><span class="p">)</span>
+        <span class="n">adata1_tmp</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">adata1_tmp</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting adata2_tmp.X from sparse to dense...&quot;</span><span class="p">)</span>
+        <span class="n">adata2_tmp</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">adata2_tmp</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="n">target_sum</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="p">,</span> <span class="n">target_sum</span><span class="o">=</span><span class="n">target_sum</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="p">)</span>
+
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="p">,</span> <span class="n">target_sum</span><span class="o">=</span><span class="n">target_sum</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="p">)</span>
+
+    <span class="n">num1</span> <span class="o">=</span> <span class="n">adata1_tmp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">adata2_tmp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">anchor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num1</span><span class="p">)</span>
+    <span class="n">positive</span> <span class="o">=</span> <span class="n">nn_approx</span><span class="p">(</span><span class="n">adata1_tmp</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">adata2_tmp</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="n">num1</span>
+    <span class="n">pair1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">anchor</span><span class="p">,</span> <span class="n">positive</span><span class="p">))</span>
+
+    <span class="n">anchor2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num2</span><span class="p">)</span> <span class="o">+</span> <span class="n">num1</span>
+    <span class="n">positive2</span> <span class="o">=</span> <span class="n">nn_approx</span><span class="p">(</span><span class="n">adata2_tmp</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">adata1_tmp</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">pair2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">anchor2</span><span class="p">,</span> <span class="n">positive2</span><span class="p">))</span>
+
+    <span class="n">pair</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># negavite partners generate </span>
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">negative_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span>
+
+    <span class="n">mask1</span> <span class="o">=</span> <span class="n">anchors</span> <span class="o">&lt;</span> <span class="n">num1</span>
+    <span class="n">negative_samples</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="o">~</span><span class="n">mask1</span>
+    <span class="n">negative_samples</span><span class="p">[</span><span class="n">mask2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num2</span><span class="p">)</span> <span class="o">+</span> <span class="n">num1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask2</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">pair_with_negatives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">pair</span><span class="p">,</span> <span class="n">negative_samples</span><span class="p">))</span>
+
+
+    <span class="k">return</span> <span class="n">pair_with_negatives</span></div>
+
+
+
+
+<div class="viewcode-block" id="compute_linkages">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.compute_linkages.html#COSIE.linkage_construction.compute_linkages">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_linkages</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">linkage_indicator</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="mi">3000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct pairwise linkage triplets across specified tissue sections and modalities</span>
+<span class="sd">    using symmetric nearest neighbor matching.</span>
+
+<span class="sd">    This function supports both strong linkages (between sections sharing the same modality)</span>
+<span class="sd">    and weak linkages (between biologically related but distinct modalities such as RNA-Protein).</span>
+<span class="sd">    This function allows flexible linkage construction based on a user-defined `linkage_indicator` dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_dict : dict</span>
+<span class="sd">        A dictionary where each key is a modality (e.g., `&#39;RNA&#39;`, `&#39;Protein&#39;`) and each value</span>
+<span class="sd">        is a list of AnnData objects (one per tissue section). Each AnnData must include:</span>
+<span class="sd">        </span>
+<span class="sd">        - `.X`: Feature or expression matrix  </span>
+<span class="sd">        - `.obs`, `.var`: Metadata  </span>
+<span class="sd">        - `.obsm[&#39;spatial&#39;]`: Spatial coordinates  </span>
+<span class="sd">        </span>
+<span class="sd">        Use `None` if a modality is missing in a section.</span>
+
+<span class="sd">    linkage_indicator : dict</span>
+<span class="sd">        A dictionary specifying which tissue section pairs and modality pairs should be linked.</span>
+<span class="sd">        Format:</span>
+<span class="sd">        {(&quot;s1&quot;, &quot;s2&quot;): [(&quot;RNA&quot;, &quot;RNA&quot;), (&quot;RNA&quot;, &quot;Protein&quot;)],(&quot;s2&quot;, &quot;s3&quot;): [(&quot;ATAC&quot;, &quot;RNA&quot;)]}</span>
+<span class="sd">        means: constructing linkage between section s1 and s2 using both RNA-RNA strong linkage and RNA-Protein weak linkage; constructing linkage between section s2 and s3 using ATAC-RNA linkage.</span>
+
+<span class="sd">    num_hvg : int, optional</span>
+<span class="sd">        Number of highly variable features to retain during feature matching.</span>
+<span class="sd">        Default is 3000.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    linkage_results : dict</span>
+<span class="sd">        A dictionary mapping each section pair (e.g., `&#39;s1_s2&#39;`) to a NumPy array of triplets.</span>
+<span class="sd">        Each triplet has the form:</span>
+<span class="sd">        </span>
+<span class="sd">        - `(anchor_index, positive_index, negative_index)`,  </span>
+
+<span class="sd">        Example format:</span>
+<span class="sd">        {&quot;s1_s2&quot;: np.ndarray of shape (N1, 3), &quot;s2_s3&quot;: np.ndarray of shape (N2, 3)}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">linkage_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># visit all specified section pairs</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">sec1</span><span class="p">,</span> <span class="n">sec2</span><span class="p">),</span> <span class="n">modality_pairs</span> <span class="ow">in</span> <span class="n">linkage_indicator</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sec1_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sec1</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="mi">1</span> 
+        <span class="n">sec2_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sec2</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="mi">1</span>  
+
+        <span class="n">all_knn_pairs</span> <span class="o">=</span> <span class="p">[]</span>  
+        <span class="n">shared_neg_samples</span> <span class="o">=</span> <span class="kc">None</span>  
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">modality1</span><span class="p">,</span> <span class="n">modality2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modality_pairs</span><span class="p">):</span>
+            <span class="n">sections1</span> <span class="o">=</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modality1</span><span class="p">)</span>
+            <span class="n">sections2</span> <span class="o">=</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modality2</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sections1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sections2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modality </span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">modality2</span><span class="si">}</span><span class="s2"> not found in data_dict&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">adata1</span> <span class="o">=</span> <span class="n">sections1</span><span class="p">[</span><span class="n">sec1_idx</span><span class="p">]</span>
+                <span class="n">adata2</span> <span class="o">=</span> <span class="n">sections2</span><span class="p">[</span><span class="n">sec2_idx</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Section index </span><span class="si">{</span><span class="n">sec1_idx</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">sec2_idx</span><span class="si">}</span><span class="s2"> out of range for modalities </span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">modality2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">adata1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">adata2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing data: </span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">sec1</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">modality2</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">sec2</span><span class="si">}</span><span class="s2"> is None&quot;</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Computing linkage between </span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">sec1</span><span class="si">}</span><span class="s1">) and </span><span class="si">{</span><span class="n">modality2</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">sec2</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+            <span class="c1"># for shared modality, use joint harmony/pca representation</span>
+            <span class="k">if</span> <span class="n">modality1</span> <span class="o">==</span> <span class="n">modality2</span><span class="p">:</span>
+                <span class="c1"># Try to use Harmony embedding if available</span>
+                <span class="k">if</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_harmony&#39;</span> <span class="ow">in</span> <span class="n">adata1</span><span class="o">.</span><span class="n">obsm</span> <span class="ow">and</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_harmony&#39;</span> <span class="ow">in</span> <span class="n">adata2</span><span class="o">.</span><span class="n">obsm</span><span class="p">:</span>
+                    <span class="n">embedding_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_harmony&#39;</span>
+                    <span class="c1"># print(f&quot;Using Harmony embedding for shared modality {modality1} between {sec1} and {sec2}&quot;)</span>
+                <span class="k">elif</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_pca&#39;</span> <span class="ow">in</span> <span class="n">adata1</span><span class="o">.</span><span class="n">obsm</span> <span class="ow">and</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_pca&#39;</span> <span class="ow">in</span> <span class="n">adata2</span><span class="o">.</span><span class="n">obsm</span><span class="p">:</span>
+                    <span class="n">embedding_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_pca&#39;</span>
+                    <span class="c1"># print(f&quot;Using PCA embedding for shared modality {modality1} between {sec1} and {sec2}&quot;)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Neither Harmony nor PCA embedding found for shared modality </span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s2"> in sections </span><span class="si">{</span><span class="n">sec1</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">sec2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+                <span class="n">knn_pair</span> <span class="o">=</span> <span class="n">perform_strong_linkage_knn</span><span class="p">(</span><span class="n">adata1</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">],</span> <span class="n">adata2</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">])</span>
+
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">knn_pair</span> <span class="o">=</span> <span class="n">perform_weak_linkage_knn</span><span class="p">(</span><span class="n">adata1</span><span class="p">,</span> <span class="n">adata2</span><span class="p">,</span> <span class="n">modality1</span><span class="p">,</span> <span class="n">modality2</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="n">num_hvg</span><span class="p">)</span>
+
+            <span class="c1"># If multiple linkages exist between two sections, share the same negative partner </span>
+            <span class="k">if</span> <span class="n">shared_neg_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">shared_neg_samples</span> <span class="o">=</span> <span class="n">knn_pair</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">knn_pair</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">shared_neg_samples</span>  
+
+            <span class="n">all_knn_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knn_pair</span><span class="p">)</span> 
+
+        <span class="n">linkage_results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sec1</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sec2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">all_knn_pairs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">linkage_results</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="split_raw_data">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.split_raw_data.html#COSIE.linkage_construction.split_raw_data">[docs]</a>
+<span class="k">def</span> <span class="nf">split_raw_data</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">spatial_loc_dict</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Divide spatial omics data from each section into spatially partitioned subgraphs.</span>
+
+<span class="sd">    Each tissue section is split into a grid of `n_x × n_y` rectangular regions of equal size.</span>
+<span class="sd">    This function is primarily used for scaling to large spatial datasets by enabling subgraph-level analysis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_dict : dict</span>
+<span class="sd">        A dictionary where each key is a modality (e.g., `&#39;RNA&#39;`, `&#39;Protein&#39;`) and each value</span>
+<span class="sd">        is a list of AnnData objects (one per tissue section). Each AnnData must include:</span>
+<span class="sd">        </span>
+<span class="sd">        - `.X`: Feature matrix  </span>
+<span class="sd">        - `.obs`, `.var`: Metadata  </span>
+<span class="sd">        - `.obsm[&#39;spatial&#39;]`: 2D spatial coordinates  </span>
+<span class="sd">        </span>
+<span class="sd">        Use `None` if a modality is missing in a section.</span>
+<span class="sd">    </span>
+<span class="sd">    spatial_loc_dict : dict</span>
+<span class="sd">        A dictionary mapping each section name (e.g., `&#39;s1&#39;`, `&#39;s2&#39;`, ...) to a 2D NumPy array of shape `(n_cells, 2)`, representing the spatial coordinates of each cell in the section.</span>
+<span class="sd">    </span>
+<span class="sd">    n_x : int</span>
+<span class="sd">        Number of spatial partitions along the x-axis.</span>
+<span class="sd">    </span>
+<span class="sd">    n_y : int</span>
+<span class="sd">        Number of spatial partitions along the y-axis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sub_data_dict : dict</span>
+<span class="sd">        A nested dictionary organizing modality-specific AnnData subgraphs by section and region.</span>
+
+<span class="sd">        Format:</span>
+<span class="sd">        {</span>
+<span class="sd">            &#39;s1&#39;: {</span>
+<span class="sd">                0: {&#39;RNA&#39;: AnnData, &#39;Protein&#39;: AnnData, ...},  # First spatial region of section s1</span>
+<span class="sd">                </span>
+<span class="sd">                1: {...},</span>
+<span class="sd">                ...</span>
+<span class="sd">            },</span>
+<span class="sd">            </span>
+<span class="sd">            &#39;s2&#39;: {</span>
+<span class="sd">                ...</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="n">sub_data_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">sec_idx</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spatial_loc_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>  
+        <span class="n">spatial_coords</span> <span class="o">=</span> <span class="n">spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">window_size_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_x</span>
+        <span class="n">window_size_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_y</span>
+
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">:</span>
+            <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">subgraph_masks</span> <span class="o">=</span> <span class="p">{}</span>  
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_x</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_y</span><span class="p">):</span>
+                <span class="n">x_start</span><span class="p">,</span> <span class="n">x_end</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">window_size_x</span><span class="p">,</span> <span class="n">x_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">window_size_x</span>
+                <span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">+</span> <span class="n">j</span> <span class="o">*</span> <span class="n">window_size_y</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">window_size_y</span>
+
+                <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">x_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x_end</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">y_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">y_end</span><span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
+                    <span class="n">subgraph_masks</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">subgraph_masks</span><span class="p">)]</span> <span class="o">=</span> <span class="n">mask</span>  
+
+        <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">adata_list</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">adata_section</span> <span class="o">=</span> <span class="n">adata_list</span><span class="p">[</span><span class="n">sec_idx</span><span class="p">]</span>  
+
+            <span class="k">if</span> <span class="n">adata_section</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">sub_idx</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">subgraph_masks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">sub_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
+                    <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+                <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata_section</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">sub_data_dict</span></div>
+
+
+
+<div class="viewcode-block" id="split_into_subgraphs">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.split_into_subgraphs.html#COSIE.linkage_construction.split_into_subgraphs">[docs]</a>
+<span class="k">def</span> <span class="nf">split_into_subgraphs</span><span class="p">(</span><span class="n">data_tensor</span><span class="p">,</span> <span class="n">spatial_coords</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split a feature tensor and its corresponding spatial coordinates into `n_x × n_y`</span>
+<span class="sd">    rectangular subregions.</span>
+
+<span class="sd">    This function is commonly used in subgraph-based training or analysis pipelines for</span>
+<span class="sd">    large-scale spatial omics datasets. It partitions both the data and the coordinate</span>
+<span class="sd">    space into equal-sized grid regions, producing corresponding subsets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_tensor : torch.Tensor</span>
+<span class="sd">        A tensor of shape `(n_cells, dim)`, representing the input features.</span>
+<span class="sd">    </span>
+<span class="sd">    spatial_coords : np.ndarray</span>
+<span class="sd">        A NumPy array of shape `(n_cells, 2)` containing 2D spatial coordinates.</span>
+<span class="sd">    </span>
+<span class="sd">    n_x : int</span>
+<span class="sd">        Number of partitions along the x-axis.</span>
+<span class="sd">    </span>
+<span class="sd">    n_y : int</span>
+<span class="sd">        Number of partitions along the y-axis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sub_feature_dict : List[torch.Tensor]</span>
+<span class="sd">        A list of tensors, each containing the features corresponding to one spatial subgraph.</span>
+<span class="sd">    </span>
+<span class="sd">    sub_spatial_list : List[np.ndarray]</span>
+<span class="sd">        A list of NumPy arrays of shape `(n_sub_cells, 2)`, where each array contains the spatial coordinates of cells within the corresponding subgraph. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sub_feature_dict</span><span class="p">,</span> <span class="n">sub_spatial_list</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">window_size_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_x</span>
+    <span class="n">window_size_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_y</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_x</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_y</span><span class="p">):</span>
+            <span class="n">x_start</span><span class="p">,</span> <span class="n">x_end</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">window_size_x</span><span class="p">,</span> <span class="n">x_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">window_size_x</span>
+            <span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">+</span> <span class="n">j</span> <span class="o">*</span> <span class="n">window_size_y</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">window_size_y</span>
+
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">x_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x_end</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">y_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">spatial_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">y_end</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">sub_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sub_feature_dict</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_tensor</span><span class="p">[</span><span class="n">sub_indices</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span>  
+                <span class="n">sub_spatial_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spatial_coords</span><span class="p">[</span><span class="n">sub_indices</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>  
+
+    <span class="k">return</span> <span class="n">sub_feature_dict</span><span class="p">,</span> <span class="n">sub_spatial_list</span></div>
+
+
+
+
+<div class="viewcode-block" id="preprocess_data_for_subgraphs">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.preprocess_data_for_subgraphs.html#COSIE.linkage_construction.preprocess_data_for_subgraphs">[docs]</a>
+<span class="k">def</span> <span class="nf">preprocess_data_for_subgraphs</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">feature_dict</span><span class="p">,</span> <span class="n">spatial_loc_dict</span><span class="p">,</span> <span class="n">linkage_indicator</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="mi">3000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split each section into spatial subgraphs and compute cross-section triplet linkages</span>
+<span class="sd">    at the subgraph level.</span>
+
+<span class="sd">    This function partitions the full spatial omics data into `n_x × n_y` subregions per section,</span>
+<span class="sd">    assigns feature and spatial data to each subgraph, and constructs triplet linkages across</span>
+<span class="sd">    specified pairs of sections and modalities using the provided `linkage_indicator`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_dict : dict</span>
+<span class="sd">        A dictionary where each key is a modality (e.g., `&#39;RNA&#39;`, `&#39;Protein&#39;`) and each value</span>
+<span class="sd">        is a list of AnnData objects (one per tissue section). Use `None` if a modality is</span>
+<span class="sd">        missing from a section.</span>
+<span class="sd">    </span>
+<span class="sd">    feature_dict : dict</span>
+<span class="sd">        A dictionary mapping each section name (e.g., `&#39;s1&#39;`, `&#39;s2&#39;`, ...) to a sub-dictionary</span>
+<span class="sd">        containing processed feature tensors for each modality as `torch.FloatTensor`.</span>
+<span class="sd">        Format:</span>
+<span class="sd">        {</span>
+<span class="sd">            &#39;s1&#39;: {&#39;RNA&#39;: torch.Tensor, &#39;Protein&#39;: torch.Tensor, ...},</span>
+<span class="sd">            &#39;s2&#39;: {...}</span>
+<span class="sd">        }</span>
+<span class="sd">    </span>
+<span class="sd">    spatial_loc_dict : dict</span>
+<span class="sd">        A dictionary mapping each section name to a 2D NumPy array of spatial coordinates.</span>
+<span class="sd">    </span>
+<span class="sd">    linkage_indicator : dict</span>
+<span class="sd">        A dictionary specifying which tissue section pairs and modality pairs should be linked.</span>
+<span class="sd">        Format:</span>
+<span class="sd">        {</span>
+<span class="sd">            (&quot;s1&quot;, &quot;s2&quot;): [(&quot;RNA&quot;, &quot;RNA&quot;), (&quot;RNA&quot;, &quot;Protein&quot;)],</span>
+<span class="sd">            (&quot;s2&quot;, &quot;s3&quot;): [(&quot;ATAC&quot;, &quot;RNA&quot;)]</span>
+<span class="sd">        }</span>
+<span class="sd">        means: constructing linkage between section s1 and s2 using both RNA-RNA strong linkage and RNA-Protein weak linkage; constructing linkage between section s2 and s3 using ATAC-RNA linkage</span>
+
+<span class="sd">    n_x : int</span>
+<span class="sd">        Number of spatial divisions along the x-axis per section.</span>
+<span class="sd">    </span>
+<span class="sd">    n_y : int</span>
+<span class="sd">        Number of spatial divisions along the y-axis per section.</span>
+<span class="sd">    </span>
+<span class="sd">    num_hvg : int, optional</span>
+<span class="sd">        Number of highly variable features to retain for linkage matching.</span>
+<span class="sd">        Default is 3000.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    new_feature_dict : dict</span>
+<span class="sd">        Nested dictionary of subgraph-level feature tensors.</span>
+<span class="sd">        Format: `{section -&gt; subregion index -&gt; modality -&gt; feature tensor}`.</span>
+<span class="sd">    </span>
+<span class="sd">    new_spatial_loc_dict : dict</span>
+<span class="sd">        Nested dictionary of subgraph spatial coordinates.</span>
+<span class="sd">        Format: `{section -&gt; subregion index -&gt; spatial coordinate array}`.</span>
+<span class="sd">    </span>
+<span class="sd">    new_linkage_results : dict</span>
+<span class="sd">        Dictionary storing cross-section linkage triplets at the subgraph level.</span>
+<span class="sd">        Keys are 4-tuples `(sec1, sub1_idx, sec2, sub2_idx)`, and values are NumPy arrays</span>
+<span class="sd">        of triplets `(anchor, positive, negative)` in concatenated space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">new_feature_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">new_spatial_loc_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">modalities</span> <span class="ow">in</span> <span class="n">feature_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Splitting section [</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">] into </span><span class="si">{</span><span class="n">n_x</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">n_y</span><span class="si">}</span><span class="s2"> subgraphs&quot;</span><span class="p">)</span>
+
+        <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">new_spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">spatial_coords</span> <span class="o">=</span> <span class="n">spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>  <span class="c1"># `numpy.ndarray`</span>
+
+        <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">data_tensor</span> <span class="ow">in</span> <span class="n">modalities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Splitting </span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s2"> in section </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+            <span class="n">sub_feature_list</span><span class="p">,</span> <span class="n">sub_spatial_list</span> <span class="o">=</span> <span class="n">split_into_subgraphs</span><span class="p">(</span><span class="n">data_tensor</span><span class="p">,</span> <span class="n">spatial_coords</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">)</span>
+
+
+            <span class="k">for</span> <span class="n">sub_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sub_feature_list</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">sub_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
+                    <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  
+                <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">][</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_feature_list</span><span class="p">[</span><span class="n">sub_idx</span><span class="p">]</span>
+                <span class="n">new_spatial_loc_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_spatial_list</span><span class="p">[</span><span class="n">sub_idx</span><span class="p">]</span>
+                
+    <span class="n">sub_data_dict</span> <span class="o">=</span> <span class="n">split_raw_data</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">spatial_loc_dict</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">)</span>
+
+
+    <span class="n">new_linkage_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">sec1</span><span class="p">,</span> <span class="n">sec2</span><span class="p">),</span> <span class="n">modality_pairs</span> <span class="ow">in</span> <span class="n">linkage_indicator</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">sec1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_feature_dict</span> <span class="ow">or</span> <span class="n">sec2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">for</span> <span class="n">sub1_idx</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">sec1</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">sub2_idx</span> <span class="ow">in</span> <span class="n">new_feature_dict</span><span class="p">[</span><span class="n">sec2</span><span class="p">]:</span>
+                <span class="n">linkage_result</span> <span class="o">=</span> <span class="n">compute_linkages_per_subgraph</span><span class="p">(</span><span class="n">sub_data_dict</span><span class="p">,</span> <span class="n">sec1</span><span class="p">,</span> <span class="n">sub1_idx</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2_idx</span><span class="p">,</span> <span class="n">modality_pairs</span><span class="p">,</span> <span class="n">num_hvg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">linkage_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">new_linkage_results</span><span class="p">[(</span><span class="n">sec1</span><span class="p">,</span> <span class="n">sub1_idx</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2_idx</span><span class="p">)]</span> <span class="o">=</span> <span class="n">linkage_result</span>
+
+    <span class="k">return</span> <span class="n">new_feature_dict</span><span class="p">,</span> <span class="n">new_spatial_loc_dict</span><span class="p">,</span> <span class="n">new_linkage_results</span></div>
+
+
+
+
+
+
+
+<div class="viewcode-block" id="compute_linkages_per_subgraph">
+<a class="viewcode-back" href="../../api/COSIE.linkage_construction.compute_linkages_per_subgraph.html#COSIE.linkage_construction.compute_linkages_per_subgraph">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_linkages_per_subgraph</span><span class="p">(</span><span class="n">sub_data_dict</span><span class="p">,</span> <span class="n">sec1</span><span class="p">,</span> <span class="n">sub1_idx</span><span class="p">,</span> <span class="n">sec2</span><span class="p">,</span> <span class="n">sub2_idx</span><span class="p">,</span> <span class="n">modality_pairs</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="mi">3000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Compute triplet linkages between two spatial subgraphs, each from a different section.</span>
+
+<span class="sd">    This function operates on spatially partitioned data (e.g., from `split_raw_data`) and</span>
+<span class="sd">    generates triplet-based cross-section linkages across paired subgraphs. It supports both</span>
+<span class="sd">    strong and weak modality linkage based on the specified modality pairs.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sub_data_dict : dict</span>
+<span class="sd">        A nested dictionary containing split AnnData objects for each modality within each subgraph per section.</span>
+<span class="sd">    </span>
+<span class="sd">    sec1 : str</span>
+<span class="sd">        Name of the first section (e.g., `&#39;s1&#39;`).</span>
+<span class="sd">    </span>
+<span class="sd">    sub1_idx : int</span>
+<span class="sd">        Index of the subgraph within the first section.</span>
+<span class="sd">    </span>
+<span class="sd">    sec2 : str</span>
+<span class="sd">        Name of the second section (e.g., `&#39;s2&#39;`).</span>
+<span class="sd">    </span>
+<span class="sd">    sub2_idx : int</span>
+<span class="sd">        Index of the subgraph within the second section.</span>
+<span class="sd">    </span>
+<span class="sd">    modality_pairs : list of tuple of str</span>
+<span class="sd">        List of modality pairs to link across the two subgraphs.</span>
+<span class="sd">        Each pair is a tuple like `(&#39;RNA&#39;, &#39;RNA&#39;)` or `(&#39;RNA&#39;, &#39;Protein&#39;)`.</span>
+<span class="sd">    </span>
+<span class="sd">    num_hvg : int, optional</span>
+<span class="sd">        Number of highly variable features to retain for linkage construction.</span>
+<span class="sd">        Default is 3000.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    triplets : np.ndarray</span>
+<span class="sd">        A NumPy array of shape `(n_triplets, 3)`, where each row is a triplet:</span>
+<span class="sd">        `(anchor_index, positive_index, negative_index)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">all_knn_pairs</span> <span class="o">=</span> <span class="p">[]</span>  
+    <span class="n">shared_neg_samples</span> <span class="o">=</span> <span class="kc">None</span>  
+
+    <span class="k">for</span> <span class="n">modality1</span><span class="p">,</span> <span class="n">modality2</span> <span class="ow">in</span> <span class="n">modality_pairs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sec1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span> <span class="ow">or</span> <span class="n">sec2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">sub1_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">sec1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">sub2_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">sec2</span><span class="p">]:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">modality1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">sec1</span><span class="p">][</span><span class="n">sub1_idx</span><span class="p">]</span> <span class="ow">or</span> <span class="n">modality2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">sec2</span><span class="p">][</span><span class="n">sub2_idx</span><span class="p">]:</span>
+            <span class="k">continue</span>
+
+        <span class="n">adata1</span> <span class="o">=</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">sec1</span><span class="p">][</span><span class="n">sub1_idx</span><span class="p">][</span><span class="n">modality1</span><span class="p">]</span>
+        <span class="n">adata2</span> <span class="o">=</span> <span class="n">sub_data_dict</span><span class="p">[</span><span class="n">sec2</span><span class="p">][</span><span class="n">sub2_idx</span><span class="p">][</span><span class="n">modality2</span><span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Computing linkage between [</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s2">] (</span><span class="si">{</span><span class="n">sec1</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">sub1_idx</span><span class="si">}</span><span class="s2">) and [</span><span class="si">{</span><span class="n">modality2</span><span class="si">}</span><span class="s2">] (</span><span class="si">{</span><span class="n">sec2</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">sub2_idx</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">modality1</span> <span class="o">==</span> <span class="n">modality2</span><span class="p">:</span>
+            <span class="n">embedding_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">modality1</span><span class="si">}</span><span class="s1">_harmony&#39;</span>
+            <span class="k">if</span> <span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">adata1</span><span class="o">.</span><span class="n">obsm</span> <span class="ow">and</span> <span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">adata2</span><span class="o">.</span><span class="n">obsm</span><span class="p">:</span>
+                <span class="n">knn_pair</span> <span class="o">=</span> <span class="n">perform_strong_linkage_knn</span><span class="p">(</span><span class="n">adata1</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">],</span> <span class="n">adata2</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Harmony embedding &#39;</span><span class="si">{</span><span class="n">embedding_key</span><span class="si">}</span><span class="s2">&#39; not found in both subgraphs </span><span class="si">{</span><span class="n">sec1</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">sub1_idx</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">sec2</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">sub2_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">knn_pair</span> <span class="o">=</span> <span class="n">perform_weak_linkage_knn</span><span class="p">(</span><span class="n">adata1</span><span class="p">,</span> <span class="n">adata2</span><span class="p">,</span> <span class="n">modality1</span><span class="p">,</span> <span class="n">modality2</span><span class="p">,</span> <span class="n">num_hvg</span><span class="o">=</span><span class="n">num_hvg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">shared_neg_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shared_neg_samples</span> <span class="o">=</span> <span class="n">knn_pair</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">knn_pair</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">shared_neg_samples</span>  
+
+        <span class="n">all_knn_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knn_pair</span><span class="p">)</span>  
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_knn_pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">all_knn_pairs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+
+
+<span class="c1">###</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Mingyao Li Lab, 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

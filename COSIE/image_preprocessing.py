@@ -323,7 +323,26 @@ def create_model(local_dir):
 # v2
 @torch.inference_mode()
 def extract_features(model: torch.nn.Module, batch: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-    # “”"Extract both 224-level and 16-level features.“”"
+    """
+    Extracts both global and local visual features from an input image batch using a pretrained model.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        A pretrained vision transformer model with a method `forward_intermediates()` that allows access to token-level outputs.
+    
+    batch : torch.Tensor
+        A batch of input images.
+
+
+    Returns
+    -------
+    feature_emb : torch.Tensor
+        The final global feature embedding.
+
+    patch_emb : torch.Tensor
+        The final local feature embedding.
+    """
     feature_emb = model(batch)
     final_output, _ = model.forward_intermediates(batch, return_prefix_tokens=False)
     local_emb = final_output[:,1:]

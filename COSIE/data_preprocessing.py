@@ -26,8 +26,8 @@ def preprocess_adata(adata_raw, modality, hvg_num=3000, n_comps=50, target_sum=N
         - `'RNA'`, `'RNA_panel2'`: RNA count matrix, supports different panels within the same RNA modality.
         - `'H3K27me3'`, `'H3K27ac'`, `'ATAC'`, `'H3K4me3'`: Epigenomic signals.  
           We recommend first converting raw epigenomics data to gene scores before using this function.
-          Gene score generation scripts are available at [link].  
-        - `'Protein'`: Protein abundance matrix; CLR normalization will be applied.  
+          Gene score generation scripts are available at cosie Repository.  
+        - `'Protein'`: Protein abundance matrix; CLR normalization will be applied. For COMET protein data, we recommend useing arcsinh normalization.
         - `'Metabolite'`: Metabolite expression matrix.  
         - `'HE'`: Histology image embeddings; PCA will be applied directly without normalization.
     
@@ -465,7 +465,7 @@ def construct_metacell_data_dict(data_dict):
     Returns
     -------
     metacell_dict : dict
-        A new dictionary with the same structure as `data_dict`, where each AnnData object has been replaced by its metacell-aggregated version, created using `metacell_construction()`. The modality and section alignment are preserved.
+        A new dictionary with the same structure as `data_dict`, where each AnnData object has been replaced by its metacell-aggregated version, created using `metacell_construction_optimized()`. The modality and section alignment are preserved.
     """
 
     metacell_dict = {}

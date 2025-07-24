@@ -404,6 +404,7 @@ def split_raw_data(data_dict, spatial_loc_dict, n_x, n_y):
         A nested dictionary organizing modality-specific AnnData subgraphs by section and region.
 
         Format:
+        
         {
             's1': {
                 0: {'RNA': AnnData, 'Protein': AnnData, ...},  # First spatial region of section s1

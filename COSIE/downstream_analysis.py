@@ -56,6 +56,7 @@ def cluster_and_visualize_superpixel(
     Perform clustering on superpixel embeddings across multiple tissue sections and visualize the results.
 
     Supports three clustering modes:
+    
     - 'joint': All sections' embeddings are clustered together.
     
     - 'independent': Each section is clustered independently.

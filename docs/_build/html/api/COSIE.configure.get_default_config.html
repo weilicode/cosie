@@ -9,7 +9,7 @@
   <title>COSIE.configure.get_default_config &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -31,8 +31,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            COSIE
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -64,6 +65,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -97,7 +99,50 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="COSIE.configure.get_default_config">
 <span class="sig-name descname"><span class="pre">get_default_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/configure.html#get_default_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.configure.get_default_config" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the hyperparameters configuration dictionary used to initialize and train the COSIE model.</p>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl>
+<dt>config<span class="classifier">dict</span></dt><dd><p>A dictionary containing the following sections:</p>
+<ul>
+<li><p>GraphAutoencoder:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>hidden_dim (list of int): Hidden layer dimensions for the graph autoencoder.</p></li>
+<li><p>activations (str): Activation function used (default: ‘relu’).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Prediction:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>hidden_dim (list of int): List of hidden layer dimensions used in the dual-prediction module.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>training:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>seed (int): Random seed for reproducibility.</p></li>
+<li><p>start_dual_prediction (int): Epoch to start dual-prediction loss.</p></li>
+<li><p>start_cross_section_integration (int): Epoch to start cross-section integration.</p></li>
+<li><p>epoch (int): Total number of training epochs.</p></li>
+<li><p>lr (float): Learning rate for optimizer.</p></li>
+<li><p>gamma (float): Weight for entropy regularization in contrastive loss.</p></li>
+<li><p>lambda1 (float): Weight for contrastive loss.</p></li>
+<li><p>lambda2 (float): Weight for prediction loss.</p></li>
+<li><p>lambda3 (float): Weight for triplet loss.</p></li>
+<li><p>knn_neighbors_spatial (int): Number of neighbors in spatial graph construction.</p></li>
+<li><p>knn_neighbors_feature (int): Number of neighbors in feature graph construction.</p></li>
+<li><p>print_num (int): Interval (in epochs) to print training progress.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 </section>
 

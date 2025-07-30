@@ -9,7 +9,7 @@
   <title>COSIE.data_preprocessing.construct_metacell_data_dict &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -31,8 +31,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            COSIE
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -69,6 +70,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -120,7 +122,7 @@ is a list of AnnData objects, one per tissue section. Each AnnData should contai
 <section id="returns">
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
 <dl class="simple">
-<dt>metacell_dict<span class="classifier">dict</span></dt><dd><p>A new dictionary with the same structure as <cite>data_dict</cite>, where each AnnData object has been replaced by its metacell-aggregated version, created using <cite>metacell_construction()</cite>. The modality and section alignment are preserved.</p>
+<dt>metacell_dict<span class="classifier">dict</span></dt><dd><p>A new dictionary with the same structure as <cite>data_dict</cite>, where each AnnData object has been replaced by its metacell-aggregated version, created using <cite>metacell_construction_optimized()</cite>. The modality and section alignment are preserved.</p>
 </dd>
 </dl>
 </section>

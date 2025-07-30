@@ -8,7 +8,7 @@
   <title>COSIE.image_preprocessing &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -28,8 +28,9 @@
 
           
           
-          <a href="../../index.html" class="icon icon-home">
-            COSIE
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -44,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -428,7 +430,26 @@
 <a class="viewcode-back" href="../../api/COSIE.image_preprocessing.extract_features.html#COSIE.image_preprocessing.extract_features">[docs]</a>
 <span class="nd">@torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-    <span class="c1"># “”&quot;Extract both 224-level and 16-level features.“”&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts both global and local visual features from an input image batch using a pretrained model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : torch.nn.Module</span>
+<span class="sd">        A pretrained vision transformer model with a method `forward_intermediates()` that allows access to token-level outputs.</span>
+<span class="sd">    </span>
+<span class="sd">    batch : torch.Tensor</span>
+<span class="sd">        A batch of input images.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    feature_emb : torch.Tensor</span>
+<span class="sd">        The final global feature embedding.</span>
+
+<span class="sd">    patch_emb : torch.Tensor</span>
+<span class="sd">        The final local feature embedding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">feature_emb</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
     <span class="n">final_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward_intermediates</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">return_prefix_tokens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">local_emb</span> <span class="o">=</span> <span class="n">final_output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span>

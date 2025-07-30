@@ -28,3 +28,8 @@
     max-width: 80% !important;
 }
 
+/* custom.css */
+.wy-side-nav-search .wy-side-nav-search .wy-logo {
+    max-width: 120px;   /* adjust width */
+    height: auto;       /* keep aspect ratio */
+}

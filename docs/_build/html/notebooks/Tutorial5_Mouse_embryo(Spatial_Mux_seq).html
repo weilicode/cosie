@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -34,8 +34,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            COSIE
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -50,11 +51,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Tutorial_of_image_feature_extraction.html">Tutorial - Image feature extraction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="1_Tutorial_of_SPOTS.html">Tutorial of SPOTS data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="2_Tutorial_of_10x_Tonsil_integration.html">Tutorial of 10x Tonsil spatial CITE-seq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial1_Periodontal%28VisiumHD_CODEX%29.html">Tutorial 1 - Periodontal data (Visium HD + CODEX)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial3_Mouse_striatum%28Spatial_Visium_MALDI%29.html">Tutorial 3 - Mouse striatum (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Load-data">Load data</a></li>
@@ -77,6 +75,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -118,10 +117,10 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">COSIE.data_preprocessing</span> <span class="kn">import</span> <span class="n">construct_metacell_data_dict</span><span class="p">,</span> <span class="n">load_data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">COSIE.data_preprocessing</span> <span class="kn">import</span> <span class="n">load_data</span>
 <span class="kn">from</span> <span class="nn">COSIE.utils</span> <span class="kn">import</span> <span class="n">setup_seed</span>
 <span class="kn">from</span> <span class="nn">COSIE.configure</span> <span class="kn">import</span> <span class="n">get_default_config</span>
 <span class="kn">from</span> <span class="nn">COSIE.COSIE_framework</span> <span class="kn">import</span> <span class="n">COSIE_model</span>
@@ -134,6 +133,7 @@
 </div>
 <section id="Load-data">
 <h2>Load data<a class="headerlink" href="#Load-data" title="Link to this heading">¶</a></h2>
+<p>For preprocessing epigenomics raw data to gene score, please refer to <a class="reference external" href="https://github.com/liranmao/Spatial_multi_omics">https://github.com/liranmao/Spatial_multi_omics</a></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>

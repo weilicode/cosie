@@ -3,16 +3,13 @@
 Welcome to the COSIE documentation!
 ==================================
 
-.. image:: ../image/logo.png
-   :width: 10%
-   :align: right
 
 COSIE enables within- and **C**\ r\ **O**\ ss-subject **S**\ patial multimodal **I**\ ntegration, imputation, and **E**\ nhancement.
 
 To get started with ``cosie``, check out the `installation guide <install.rst>`__ and `tutorials <tutorials.rst>`__.
 
 
-.. image:: ../image/framework.png
+.. image:: ../image/framework.svg
    :width: 95%
    :align: center
 
@@ -25,7 +22,7 @@ To get started with ``cosie``, check out the `installation guide <install.rst>`_
    install
    tutorials
    api
-
+   references
 
 Citation
 ========

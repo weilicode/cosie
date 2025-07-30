@@ -24,12 +24,12 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": null,
    "id": "72894dd8-fbc3-4fe7-ae40-4027265514dd",
    "metadata": {},
    "outputs": [],
    "source": [
-    "from COSIE.data_preprocessing import construct_metacell_data_dict, load_data\n",
+    "from COSIE.data_preprocessing import load_data\n",
     "from COSIE.utils import setup_seed\n",
     "from COSIE.configure import get_default_config\n",
     "from COSIE.COSIE_framework import COSIE_model\n",

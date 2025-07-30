@@ -9,7 +9,7 @@
   <title>COSIE.downstream_analysis.cluster_and_visualize_superpixel &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -31,8 +31,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            COSIE
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -76,6 +77,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -110,9 +112,9 @@
 <dt class="sig sig-object py" id="COSIE.downstream_analysis.cluster_and_visualize_superpixel">
 <span class="sig-name descname"><span class="pre">cluster_and_visualize_superpixel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">final_embeddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defined_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spatial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swap_xy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_spine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">35</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/downstream_analysis.html#cluster_and_visualize_superpixel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.downstream_analysis.cluster_and_visualize_superpixel" title="Link to this definition">¶</a></dt>
 <dd><p>Perform clustering on superpixel embeddings across multiple tissue sections and visualize the results.</p>
-<p>Supports three clustering modes:
-- ‘joint’: All sections’ embeddings are clustered together.</p>
+<p>Supports three clustering modes:</p>
 <ul class="simple">
+<li><p>‘joint’: All sections’ embeddings are clustered together.</p></li>
 <li><p>‘independent’: Each section is clustered independently.</p></li>
 <li><p>‘defined’: Uses user-specified cluster labels.</p></li>
 </ul>

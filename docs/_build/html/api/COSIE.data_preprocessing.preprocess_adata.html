@@ -9,7 +9,7 @@
   <title>COSIE.data_preprocessing.preprocess_adata &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -31,8 +31,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            COSIE
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -69,6 +70,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -114,8 +116,8 @@
 <li><p><cite>‘RNA’</cite>, <cite>‘RNA_panel2’</cite>: RNA count matrix, supports different panels within the same RNA modality.</p></li>
 <li><p><cite>‘H3K27me3’</cite>, <cite>‘H3K27ac’</cite>, <cite>‘ATAC’</cite>, <cite>‘H3K4me3’</cite>: Epigenomic signals.  
 We recommend first converting raw epigenomics data to gene scores before using this function.
-Gene score generation scripts are available at [link].</p></li>
-<li><p><cite>‘Protein’</cite>: Protein abundance matrix; CLR normalization will be applied.</p></li>
+Gene score generation scripts are available at cosie Repository.</p></li>
+<li><p><cite>‘Protein’</cite>: Protein abundance matrix; CLR normalization will be applied. For COMET protein data, we recommend useing arcsinh normalization.</p></li>
 <li><p><cite>‘Metabolite’</cite>: Metabolite expression matrix.</p></li>
 <li><p><cite>‘HE’</cite>: Histology image embeddings; PCA will be applied directly without normalization.</p></li>
 </ul>

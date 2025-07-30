@@ -9,7 +9,7 @@
   <title>COSIE.image_preprocessing.extract_features &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=9b90a8f0" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -31,8 +31,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            COSIE
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -78,6 +79,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -111,11 +113,30 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="COSIE.image_preprocessing.extract_features">
 <span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/COSIE/image_preprocessing.html#extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#COSIE.image_preprocessing.extract_features" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Extracts both global and local visual features from an input image batch using a pretrained model.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>]</span></p>
 </dd>
 </dl>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>model<span class="classifier">torch.nn.Module</span></dt><dd><p>A pretrained vision transformer model with a method <cite>forward_intermediates()</cite> that allows access to token-level outputs.</p>
+</dd>
+<dt>batch<span class="classifier">torch.Tensor</span></dt><dd><p>A batch of input images.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>feature_emb<span class="classifier">torch.Tensor</span></dt><dd><p>The final global feature embedding.</p>
+</dd>
+<dt>patch_emb<span class="classifier">torch.Tensor</span></dt><dd><p>The final local feature embedding.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </section>

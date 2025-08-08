@@ -513,7 +513,7 @@ def cluster_and_visualize(
 
 
 
-def perform_imputation(
+def perform_prediction(
     data_dict,
     final_embeddings,
     target_section,
@@ -527,10 +527,10 @@ def perform_imputation(
     n_trees=10    
 ):
     """
-    Perform KNN-based imputation for a specific modality in a target tissue section.
+    Perform KNN-based prediction for a specific modality in a target tissue section.
 
-    The imputed values are computed by identifying the K nearest neighbors in the embedding space
-    from source sections and averaging their expression values for the specified molecules. If accelerate = True, PCA will be conducted and imputation will be performed based on the PCA embedding instead. 
+    The predicted values are computed by identifying the K nearest neighbors in the embedding space
+    from source sections and averaging their expression values for the specified molecules. If accelerate = True, PCA will be conducted and preeiction will be performed based on the PCA embedding instead. 
 
     Parameters
     ----------
@@ -541,32 +541,32 @@ def perform_imputation(
         A dictionary mapping section names (e.g., `'s1'`, `'s2'`, ...) to 2D NumPy arrays of shape (n_cells, latent_dim), representing cell embeddings for each section.
     
     target_section : str
-        The name of the section to impute (e.g., `'s1'`).
+        The name of the section to predict (e.g., `'s1'`).
     
     target_modality : str
-        The modality to impute (e.g., `'RNA'`, `'Protein'`, `'Metabolite'`).
+        The modality to predict (e.g., `'RNA'`, `'Protein'`, `'Metabolite'`).
     
     K_num : int, optional
-        Number of nearest neighbors used for imputation. Default is 50.
+        Number of nearest neighbors used for prediction. Default is 50.
     
     source_sections : list of str or None, optional
         A list of section names to serve as the source data. If None, all sections with the target modality will be used. Default is None.
     
     target_molecules : str or list, optional
-        Features (genes, proteins, metabolites, etc.) to impute:
+        Features (genes, proteins, metabolites, etc.) to predict:
         
-        - `'All'`: Impute the intersection of all shared features across source sections.  
-        - list: A specific list of features to impute (e.g., `['CD4', 'CD68']`).  
+        - `'All'`: Predict the intersection of all shared features across source sections.  
+        - list: A specific list of features to predict (e.g., `['CD4', 'CD68']`).  
         Default is `'All'`.
     
     block_size : int or None, optional
-        If set, perform block-wise imputation across features to reduce memory usage. Each block contains up to `block_size` features. Default is None.
+        If set, perform block-wise prediction across features to reduce memory usage. Each block contains up to `block_size` features. Default is None.
     
     metric : str, optional
         Distance metric used in approximate nearest neighbor search (via Annoy). Must be one of: {'euclidean', 'manhattan', 'angular', 'hamming', 'dot'}. Default is `'euclidean'`.
 
     accelerate : bool, optional
-        Whether to perform joint PCA dimensionality reduction (to 50 dimensions) on all embeddings before imputation. 
+        Whether to perform joint PCA dimensionality reduction (to 50 dimensions) on all embeddings before prediction. 
         This can accelerate nearest neighbor search and reduce memory usage. Default is False.
 
     
@@ -576,11 +576,11 @@ def perform_imputation(
     Returns
     -------
     new_adata : AnnData
-        A new AnnData object containing the imputed data. Includes:
+        A new AnnData object containing the predicted data. Includes:
         
-        - `.X`: Imputed expression matrix as a dense NumPy array.  
+        - `.X`: Predicted expression matrix as a dense NumPy array.  
         - `.obs`: Metadata copied from the target section’s reference AnnData.  
-        - `.var`: Feature names associated with the imputed modality.  
+        - `.var`: Feature names associated with the predicted modality.  
         - `.obsm['spatial']`: Copied spatial coordinates (if present).
     """
     from sklearn.decomposition import PCA
@@ -750,7 +750,7 @@ def plot_marker_comparison(
         The molecule name to visualize. Must be present in `.var` of both AnnData objects.
     
     adata1 : AnnData
-        The first AnnData object, e.g., for imputed data.
+        The first AnnData object, e.g., for predicted data.
     
     adata2 : AnnData
         The second AnnData object, e.g., for observed data.
@@ -1394,6 +1394,58 @@ def relabel_clusters_sequentially(cluster_label_dict):
         relabeled_dict[section] = relabeled_labels
 
     return relabeled_dict
+
+
+
+def truncate_gene_expression_smartclip(adata, gene, lower=0, upper=99):
+    """
+    Truncate expression data based on non-zero values to reduce the impact of extreme outliers in visualization.
+
+    Parameters
+    ----------
+    adata : AnnData
+        Input AnnData object.
+    
+    gene : str
+        Gene name (must be in adata.var_names).
+    
+    lower : float, optional
+        Lower percentile to truncate. Default is 0.
+    
+    upper : float, optional
+        Upper percentile to truncate. Default is 99.
+
+    Returns
+    -------
+    AnnData
+        New AnnData object with truncated expression values in .X.
+    """
+
+    values = adata[:, gene].X
+    if hasattr(values, "toarray"):
+        values = values.toarray().flatten()
+    else:
+        values = np.array(values).flatten()
+
+    nonzero_values = values[values > 0]
+    num_nonzero = len(nonzero_values)
+    num_total = len(values)
+
+    if num_nonzero == 0:
+        values_clipped = values
+    else:
+        vmin = np.percentile(nonzero_values, lower) if lower > 0 else 0
+        vmax = np.percentile(nonzero_values, upper)
+        values_clipped = np.clip(values, vmin, vmax)
+
+    new_adata = ad.AnnData(
+        X=values_clipped[:, np.newaxis],
+        obs=adata.obs.copy(),
+        var=adata[:, gene].var.copy(),
+        obsm=adata.obsm.copy()
+    )
+
+    return new_adata
 
 
 

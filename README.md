@@ -13,7 +13,7 @@ COSIE enables within- and **C**r**O**ss-subject **S**patial multimodal **I**nteg
 
 
 <p align="center">
-  <img width="95%" src=./image/framework.png>
+  <img width="95%" src=./image/framework.jpg>
 </p>
 
 

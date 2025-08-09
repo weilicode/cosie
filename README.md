@@ -7,7 +7,7 @@
 [![python >3.9.19](https://img.shields.io/badge/python-3.9.19-blue)](https://www.python.org/) 
 
 
-COSIE enables within- and **C**r**O**ss-subject **S**patial multimodal **I**ntegration, imputation, and **E**nhancement. 
+COSIE enables within- and **C**r**O**ss-subject **S**patial multimodal **I**ntegration, prediction, and **E**nhancement. 
 
 
 

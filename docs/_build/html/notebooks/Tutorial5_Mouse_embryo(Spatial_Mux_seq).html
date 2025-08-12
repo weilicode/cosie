@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tutorial 6 - Gastric cancer (Visium + COMET)" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html" />
-    <link rel="prev" title="Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html" /> 
+    <link rel="prev" title="Tutorial 2 - Atherosclerosis (Xenium + CODEX)" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,25 +53,22 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial_of_image_feature_extraction.html">Tutorial - Image feature extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial1_Periodontal%28VisiumHD_CODEX%29.html">Tutorial 1 - Periodontal data (Visium HD + CODEX)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Load-data">Load data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Define-the-dictionary-structure-for-input-data">Define the dictionary structure for input data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Specify-the-linkage-indicator">Specify the linkage indicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Define-COSIE-Model-and-Perform-Integration">Define COSIE Model and Perform Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Perform-clustering-and-visualization">Perform clustering and visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-ATAC-for-section1">Impute ATAC for section1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-H3K4me3-for-section1">Impute H3K4me3 for section1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-RNA-for-section1">Impute RNA for section1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-H3K27ac-for-section2">Impute H3K27ac for section2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-ATAC-for-section1">Predict ATAC for section1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-H3K4me3-for-section1">Predict H3K4me3 for section1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-RNA-for-section1">Predict RNA for section1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-H3K27ac-for-section2">Predict H3K27ac for section2</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html">Tutorial 6 - Gastric cancer (Visium + COMET)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html">Tutorial 7 - Lung cancer (Spatial CITE-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial8_Mouse_spleen%28SPOTS%29.html">Tutorial 8 - Mouse spleen (SPOTS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial9_LUAD_TCGA.html">Tutorial 9 - LUAD TCGA integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial10_B_cell_lymphoma%28CosMx_CODEX%29.html">Tutorial 10 - B cell lymphoma (CosMx + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial11_Tonsil%28Spatial_CITE_seq%29.html">Tutorial 11 - Tonsil (Spatial CITE-seq)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
@@ -133,7 +130,6 @@
 </div>
 <section id="Load-data">
 <h2>Load data<a class="headerlink" href="#Load-data" title="Link to this heading">¶</a></h2>
-<p>For preprocessing epigenomics raw data to gene score, please refer to <a class="reference external" href="https://github.com/liranmao/Spatial_multi_omics">https://github.com/liranmao/Spatial_multi_omics</a></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -472,13 +468,13 @@ Perform joint clustering...
 </div>
 </div>
 </section>
-<section id="Impute-ATAC-for-section1">
-<h2>Impute ATAC for section1<a class="headerlink" href="#Impute-ATAC-for-section1" title="Link to this heading">¶</a></h2>
+<section id="Predict-ATAC-for-section1">
+<h2>Predict ATAC for section1<a class="headerlink" href="#Predict-ATAC-for-section1" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_ATAC_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_ATAC_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s1&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;ATAC&#39;</span><span class="p">,</span>
@@ -500,21 +496,21 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_ATAC_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_ATAC_imputed</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_ATAC_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_ATAC_predicted</span><span class="p">)</span>
 <span class="n">adata2_ATAC_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_atac</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;Alb&#39;</span>
 <span class="n">plot_marker_comparison</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata1_ATAC_imputed_norm</span><span class="p">,</span>
+                       <span class="n">adata1_ATAC_predicted_norm</span><span class="p">,</span>
                        <span class="n">adata2_ATAC_norm</span><span class="p">,</span>
-                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section s1 Imputed ATAC&#39;</span><span class="p">,</span>
-                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section s2 Observed ATAC&#39;</span><span class="p">,</span>
+                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 predicted ATAC&#39;</span><span class="p">,</span>
+                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed ATAC&#39;</span><span class="p">,</span>
                        <span class="n">dpi</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
                        <span class="n">s</span><span class="o">=</span><span class="mi">220</span><span class="p">)</span>
 </pre></div>
@@ -536,13 +532,13 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 </div>
 </div>
 </section>
-<section id="Impute-H3K4me3-for-section1">
-<h2>Impute H3K4me3 for section1<a class="headerlink" href="#Impute-H3K4me3-for-section1" title="Link to this heading">¶</a></h2>
+<section id="Predict-H3K4me3-for-section1">
+<h2>Predict H3K4me3 for section1<a class="headerlink" href="#Predict-H3K4me3-for-section1" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_H3K4me3_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_H3K4me3_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s1&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;H3K4me3&#39;</span><span class="p">,</span>
@@ -564,7 +560,7 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_H3K4me3_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_H3K4me3_imputed</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_H3K4me3_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_H3K4me3_predicted</span><span class="p">)</span>
 <span class="n">adata2_H3K4me3_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_4me3</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -574,10 +570,10 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_marker_comparison</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata1_H3K4me3_imputed_norm</span><span class="p">,</span>
+                       <span class="n">adata1_H3K4me3_predicted_norm</span><span class="p">,</span>
                        <span class="n">adata2_H3K4me3_norm</span><span class="p">,</span>
-                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section s1 Imputed H3K4me3&#39;</span><span class="p">,</span>
-                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section s2 Observed H3K4me3&#39;</span><span class="p">,</span>
+                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 predicted H3K4me3&#39;</span><span class="p">,</span>
+                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed H3K4me3&#39;</span><span class="p">,</span>
                        <span class="n">dpi</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
                        <span class="n">s</span><span class="o">=</span><span class="mi">220</span><span class="p">)</span>
 </pre></div>
@@ -607,13 +603,13 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 </div>
 </div>
 </section>
-<section id="Impute-RNA-for-section1">
-<h2>Impute RNA for section1<a class="headerlink" href="#Impute-RNA-for-section1" title="Link to this heading">¶</a></h2>
+<section id="Predict-RNA-for-section1">
+<h2>Predict RNA for section1<a class="headerlink" href="#Predict-RNA-for-section1" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_RNA_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_RNA_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s1&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;RNA&#39;</span><span class="p">,</span>
@@ -631,24 +627,18 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 [RNA] exists in [&#39;s2&#39;], which will be used as source data section
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_RNA_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_RNA_imputed</span><span class="p">)</span>
-<span class="n">adata2_rna_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_rna</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_marker_comparison</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata1_RNA_imputed_norm</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_RNA_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_RNA_predicted</span><span class="p">)</span>
+<span class="n">adata2_rna_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_rna</span><span class="p">)</span>
+
+<span class="n">plot_marker_comparison</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
+                       <span class="n">adata1_RNA_predicted_norm</span><span class="p">,</span>
                        <span class="n">adata2_rna_norm</span><span class="p">,</span>
-                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section s1 Imputed RNA&#39;</span><span class="p">,</span>
-                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section s2 Observed RNA&#39;</span><span class="p">,</span>
+                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 predicted RNA&#39;</span><span class="p">,</span>
+                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed RNA&#39;</span><span class="p">,</span>
                        <span class="n">dpi</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
                        <span class="n">s</span><span class="o">=</span><span class="mi">220</span><span class="p">)</span>
 </pre></div>
@@ -658,7 +648,7 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_38_0.png" src="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_38_0.png" />
+<img alt="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_37_0.png" src="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_37_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -670,13 +660,13 @@ Using modality [H3K27me3] in section [s1] as spatial/obs reference
 </div>
 </div>
 </section>
-<section id="Impute-H3K27ac-for-section2">
-<h2>Impute H3K27ac for section2<a class="headerlink" href="#Impute-H3K27ac-for-section2" title="Link to this heading">¶</a></h2>
+<section id="Predict-H3K27ac-for-section2">
+<h2>Predict H3K27ac for section2<a class="headerlink" href="#Predict-H3K27ac-for-section2" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_H3K27ac_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_H3K27ac_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s2&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;H3K27ac&#39;</span><span class="p">,</span>
@@ -698,7 +688,7 @@ Using modality [H3K27me3] in section [s2] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_H3K27ac_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_H3K27ac_imputed</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_H3K27ac_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_H3K27ac_predicted</span><span class="p">)</span>
 <span class="n">adata1_27ac_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_27ac</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -708,10 +698,10 @@ Using modality [H3K27me3] in section [s2] as spatial/obs reference
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_marker_comparison</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata2_H3K27ac_imputed_norm</span><span class="p">,</span>
+                       <span class="n">adata2_H3K27ac_predicted_norm</span><span class="p">,</span>
                        <span class="n">adata1_27ac_norm</span><span class="p">,</span>
-                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section s2 Imputed H3K27ac&#39;</span><span class="p">,</span>
-                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section s1 Observed H3K27ac&#39;</span><span class="p">,</span>
+                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 predicted H3K27ac&#39;</span><span class="p">,</span>
+                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 observed H3K27ac&#39;</span><span class="p">,</span>
                        <span class="n">dpi</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
                        <span class="n">s</span><span class="o">=</span><span class="mi">220</span><span class="p">)</span>
 </pre></div>
@@ -721,7 +711,7 @@ Using modality [H3K27me3] in section [s2] as spatial/obs reference
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_43_0.png" src="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_43_0.png" />
+<img alt="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_42_0.png" src="../_images/notebooks_Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29_42_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -739,7 +729,7 @@ Using modality [H3K27me3] in section [s2] as spatial/obs reference
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html" class="btn btn-neutral float-left" title="Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html" class="btn btn-neutral float-left" title="Tutorial 2 - Atherosclerosis (Xenium + CODEX)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html" class="btn btn-neutral float-right" title="Tutorial 6 - Gastric cancer (Visium + COMET)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

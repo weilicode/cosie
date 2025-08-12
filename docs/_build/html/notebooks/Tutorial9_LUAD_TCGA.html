@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -53,10 +53,8 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial_of_image_feature_extraction.html">Tutorial - Image feature extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial1_Periodontal%28VisiumHD_CODEX%29.html">Tutorial 1 - Periodontal data (Visium HD + CODEX)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html">Tutorial 6 - Gastric cancer (Visium + COMET)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html">Tutorial 7 - Lung cancer (Spatial CITE-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial8_Mouse_spleen%28SPOTS%29.html">Tutorial 8 - Mouse spleen (SPOTS)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 9 - LUAD TCGA integration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Load-data">Load data</a></li>
@@ -64,15 +62,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#Specify-the-linkage-indicator">Specify the linkage indicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Define-COSIE-Model-and-Perform-Integration">Define COSIE Model and Perform Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Perform-clustering-and-visualization">Perform clustering and visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-superpixel-level-RNA-data-for-TCGA-samples">Impute superpixel-level RNA data for TCGA samples</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Imputation-of-section2-gene">Imputation of section2 gene</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Imputation-of-section3-gene">Imputation of section3 gene</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-superpixel-level-RNA-data-for-TCGA-samples">Predict superpixel-level RNA data for TCGA samples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Prediction-of-section2-gene">Prediction of section2 gene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Prediction-of-section3-gene">Prediction of section3 gene</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial10_B_cell_lymphoma%28CosMx_CODEX%29.html">Tutorial 10 - B cell lymphoma (CosMx + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial11_Tonsil%28Spatial_CITE_seq%29.html">Tutorial 11 - Tonsil (Spatial CITE-seq)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
@@ -134,7 +131,7 @@
 </div>
 <section id="Load-data">
 <h2>Load data<a class="headerlink" href="#Load-data" title="Link to this heading">¶</a></h2>
-<p>Here we utilized the previous imputed data of lung cancer Section4 as reference.</p>
+<p>Here the gene expression for Section 4 itself was predicted from prior 4-section integration.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -236,7 +233,7 @@ AnnData object with n_obs × n_vars = 89797 × 2048
 <section id="Define-the-dictionary-structure-for-input-data">
 <h2>Define the dictionary structure for input data<a class="headerlink" href="#Define-the-dictionary-structure-for-input-data" title="Link to this heading">¶</a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span>
@@ -543,24 +540,16 @@ Perform joint clustering...
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 </section>
-<section id="Impute-superpixel-level-RNA-data-for-TCGA-samples">
-<h2>Impute superpixel-level RNA data for TCGA samples<a class="headerlink" href="#Impute-superpixel-level-RNA-data-for-TCGA-samples" title="Link to this heading">¶</a></h2>
-<section id="Imputation-of-section2-gene">
-<h3>Imputation of section2 gene<a class="headerlink" href="#Imputation-of-section2-gene" title="Link to this heading">¶</a></h3>
+<section id="Predict-superpixel-level-RNA-data-for-TCGA-samples">
+<h2>Predict superpixel-level RNA data for TCGA samples<a class="headerlink" href="#Predict-superpixel-level-RNA-data-for-TCGA-samples" title="Link to this heading">¶</a></h2>
+<section id="Prediction-of-section2-gene">
+<h3>Prediction of section2 gene<a class="headerlink" href="#Prediction-of-section2-gene" title="Link to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_gene_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_gene_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s2&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;RNA&#39;</span><span class="p">,</span>
@@ -579,94 +568,43 @@ Using modality [HE] in section [s2] as spatial/obs reference
 [RNA] exists in [&#39;s1&#39;], which will be used as source data section
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[97]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;YAP1&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_rna_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_rna</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_gene_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_gene_predicted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;TM4SF1&#39;</span>
 <span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata2_gene_imputed</span><span class="p">,</span>
-                       <span class="n">adata1_rna</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s2 Imputed&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s1 Observed&#39;</span><span class="p">,</span>
-                        <span class="n">save_path</span> <span class="o">=</span> <span class="s1">&#39;./plot_for_paper/lung_TCGA_high2_low2/Imputation/high2_</span><span class="si">{}</span><span class="s1">.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">),</span>
+                       <span class="n">adata2_gene_predicted_norm</span><span class="p">,</span>
+                       <span class="n">adata1_rna_norm</span><span class="p">,</span>
+                       <span class="s1">&#39;Section2 predicted&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;Section1 (predicted from prior integration)&#39;</span><span class="p">,</span>
                         <span class="n">dpi</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
                         <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;turbo&quot;</span><span class="p">,</span>
                         <span class="n">figscale</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,)</span>
 <br/></pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Saving marker comparison to: ./plot_for_paper/lung_TCGA_high2_low2/Imputation/high2_YAP1.pdf
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_Tutorial9_LUAD_TCGA_29_1.png" src="../_images/notebooks_Tutorial9_LUAD_TCGA_29_1.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;YAP1&#39;</span><span class="p">,</span> <span class="s1">&#39;CEACAM6&#39;</span><span class="p">,</span> <span class="s1">&#39;TM4SF1&#39;</span><span class="p">,</span> <span class="s1">&#39;MUC1&#39;</span><span class="p">]</span>
-<span class="n">signature</span> <span class="o">=</span> <span class="n">adata2_gene_imputed</span><span class="p">[:,</span> <span class="n">genes</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">signature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="n">adata2_gene_imputed_signature</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
-<span class="n">adata2_gene_imputed_signature</span><span class="o">.</span><span class="n">var_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;signature&#39;</span><span class="p">]</span>
-<span class="n">adata2_gene_imputed_signature</span><span class="o">.</span><span class="n">obsm</span> <span class="o">=</span> <span class="n">adata2_gene_imputed</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">adata2_gene_imputed_signature</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-AnnData object with n_obs × n_vars = 1118294 × 1
-    obsm: &#39;spatial&#39;
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[100]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;pdf.fonttype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span>
-<span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;signature&#39;</span>
-<span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata2_gene_imputed_signature</span><span class="p">,</span>
-                       <span class="n">adata1_rna_signature</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s2 Imputed&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s1 Observed&#39;</span><span class="p">,</span>
-                        <span class="n">save_path</span> <span class="o">=</span> <span class="s1">&#39;./plot_for_paper/lung_TCGA_high2_low2/Imputation/high2_</span><span class="si">{}</span><span class="s1">.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">),</span>
-                        <span class="n">dpi</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-                        <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;turbo&quot;</span><span class="p">,</span>
-                        <span class="n">figscale</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,)</span>
-<br/></pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Saving marker comparison to: ./plot_for_paper/lung_TCGA_high2_low2/Imputation/high2_signature.pdf
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/notebooks_Tutorial9_LUAD_TCGA_31_1.png" src="../_images/notebooks_Tutorial9_LUAD_TCGA_31_1.png" />
+<img alt="../_images/notebooks_Tutorial9_LUAD_TCGA_30_0.png" src="../_images/notebooks_Tutorial9_LUAD_TCGA_30_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -678,13 +616,13 @@ Saving marker comparison to: ./plot_for_paper/lung_TCGA_high2_low2/Imputation/hi
 </div>
 </div>
 </section>
-<section id="Imputation-of-section3-gene">
-<h3>Imputation of section3 gene<a class="headerlink" href="#Imputation-of-section3-gene" title="Link to this heading">¶</a></h3>
+<section id="Prediction-of-section3-gene">
+<h3>Prediction of section3 gene<a class="headerlink" href="#Prediction-of-section3-gene" title="Link to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata3_gene_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata3_gene_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s3&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;RNA&#39;</span><span class="p">,</span>
@@ -707,7 +645,7 @@ Using modality [HE] in section [s3] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata3_gene_imputed</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata3_gene_predicted</span>
 </pre></div>
 </div>
 </div>
@@ -721,16 +659,24 @@ AnnData object with n_obs × n_vars = 89797 × 2352
     obsm: &#39;spatial&#39;
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;YAP1&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata3_gene_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata3_gene_predicted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;TM4SF1&#39;</span>
 <span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata3_gene_imputed</span><span class="p">,</span>
-                       <span class="n">adata1_rna</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s3 Imputed&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s1 Observed&#39;</span><span class="p">,</span>
+                       <span class="n">adata3_gene_predicted_norm</span><span class="p">,</span>
+                       <span class="n">adata1_rna_norm</span><span class="p">,</span>
+                       <span class="s1">&#39;Section3 predicted&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;Section1 (predicted from prior integration)&#39;</span><span class="p">,</span>
                         <span class="n">figscale</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,)</span>
 <br/></pre></div>
 </div>
@@ -740,72 +686,6 @@ AnnData object with n_obs × n_vars = 89797 × 2352
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/notebooks_Tutorial9_LUAD_TCGA_36_0.png" src="../_images/notebooks_Tutorial9_LUAD_TCGA_36_0.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">signature</span> <span class="o">=</span> <span class="n">adata3_gene_imputed</span><span class="p">[:,</span> <span class="n">genes</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">signature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="n">adata3_gene_imputed_signature</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
-<span class="n">adata3_gene_imputed_signature</span><span class="o">.</span><span class="n">var_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;signature&#39;</span><span class="p">]</span>
-<span class="n">adata3_gene_imputed_signature</span><span class="o">.</span><span class="n">obsm</span> <span class="o">=</span> <span class="n">adata3_gene_imputed</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">adata3_gene_imputed_signature</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-AnnData object with n_obs × n_vars = 89797 × 1
-    obsm: &#39;spatial&#39;
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[105]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;signature&#39;</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;pdf.fonttype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span>
-
-<span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata3_gene_imputed_signature</span><span class="p">,</span>
-                       <span class="n">adata1_rna_signature</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s3 Imputed&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s1 Observed&#39;</span><span class="p">,</span>
-                       <span class="n">save_path</span> <span class="o">=</span> <span class="s1">&#39;./plot_for_paper/lung_TCGA_high2_low2/Imputation/low2_</span><span class="si">{}</span><span class="s1">.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">),</span>
-                       <span class="n">dpi</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-                       <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;turbo&quot;</span><span class="p">,</span>
-                       <span class="n">figscale</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,)</span>
-<br/></pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Saving marker comparison to: ./plot_for_paper/lung_TCGA_high2_low2/Imputation/low2_signature.pdf
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/notebooks_Tutorial9_LUAD_TCGA_38_1.png" src="../_images/notebooks_Tutorial9_LUAD_TCGA_38_1.png" />
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">

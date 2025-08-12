@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tutorial 9 - LUAD TCGA integration" href="Tutorial9_LUAD_TCGA.html" />
-    <link rel="prev" title="Tutorial 7 - Lung cancer (Spatial CITE-seq)" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html" /> 
+    <link rel="prev" title="Tutorial 6 - Gastric cancer (Visium + COMET)" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,10 +53,8 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial_of_image_feature_extraction.html">Tutorial - Image feature extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial1_Periodontal%28VisiumHD_CODEX%29.html">Tutorial 1 - Periodontal data (Visium HD + CODEX)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html">Tutorial 6 - Gastric cancer (Visium + COMET)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html">Tutorial 7 - Lung cancer (Spatial CITE-seq)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 8 - Mouse spleen (SPOTS)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Load-the-required-packages">Load the required packages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Load-Data">Load Data</a></li>
@@ -64,12 +62,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#Specify-the-Linkage-Indicator">Specify the Linkage Indicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Define-COSIE-model-and-perform-integration">Define COSIE model and perform integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Joint-clustering-and-visualization">Joint clustering and visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-protein-data-for-Section-2">Impute protein data for Section 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-protein-data-for-Section-2">Predict protein data for Section 2</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial9_LUAD_TCGA.html">Tutorial 9 - LUAD TCGA integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial10_B_cell_lymphoma%28CosMx_CODEX%29.html">Tutorial 10 - B cell lymphoma (CosMx + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial11_Tonsil%28Spatial_CITE_seq%29.html">Tutorial 11 - Tonsil (Spatial CITE-seq)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
@@ -129,7 +126,7 @@
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_default_config</span><span class="p">()</span>
 <span class="n">setup_seed</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;training&#39;</span><span class="p">][</span><span class="s1">&#39;seed&#39;</span><span class="p">])</span>
-<br/><br/></pre></div>
+</pre></div>
 </div>
 </div>
 </section>
@@ -155,7 +152,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_rna</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
@@ -412,15 +409,15 @@ Perform joint clustering...
 </div>
 </div>
 </section>
-<section id="Impute-protein-data-for-Section-2">
-<h2>Impute protein data for Section 2<a class="headerlink" href="#Impute-protein-data-for-Section-2" title="Link to this heading">¶</a></h2>
+<section id="Predict-protein-data-for-Section-2">
+<h2>Predict protein data for Section 2<a class="headerlink" href="#Predict-protein-data-for-Section-2" title="Link to this heading">¶</a></h2>
 <p>COSIE recovers missing modality data for each section by leveraging feature similarity within its integrated embedding space.</p>
-<p>Users can specify the <strong>section</strong> to be imputed, the <strong>modality</strong> to recover, the <strong>target molecules</strong>, and one or more <strong>source sections</strong> from which observed data will serve as the reference.</p>
+<p>Users can specify the <strong>section</strong> to be predicted, the <strong>modality</strong> to recover, the <strong>target molecules</strong>, and one or more <strong>source sections</strong> from which observed data will serve as the reference.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_adt_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_adt_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s2&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;Protein&#39;</span><span class="p">,</span>
@@ -446,9 +443,9 @@ Using modality [RNA] in section [s2] as spatial/obs reference
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_protein</span> <span class="o">=</span> <span class="s1">&#39;CD4&#39;</span>
 <span class="n">plot_marker_comparison</span><span class="p">(</span><span class="n">chosed_protein</span><span class="p">,</span>
                        <span class="n">adata2_adt</span><span class="p">,</span>
-                       <span class="n">adata2_adt_imputed</span><span class="p">,</span>
-                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section s2 observed&#39;</span><span class="p">,</span>
-                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section s2 imputed&#39;</span><span class="p">,</span>
+                       <span class="n">adata2_adt_predicted</span><span class="p">,</span>
+                       <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed&#39;</span><span class="p">,</span>
+                       <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 predicted&#39;</span><span class="p">,</span>
                        <span class="n">dpi</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
                        <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
@@ -476,7 +473,7 @@ Using modality [RNA] in section [s2] as spatial/obs reference
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html" class="btn btn-neutral float-left" title="Tutorial 7 - Lung cancer (Spatial CITE-seq)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html" class="btn btn-neutral float-left" title="Tutorial 6 - Gastric cancer (Visium + COMET)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Tutorial9_LUAD_TCGA.html" class="btn btn-neutral float-right" title="Tutorial 9 - LUAD TCGA integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

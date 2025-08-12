@@ -8,7 +8,7 @@
   <title>COSIE.downstream_analysis &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -597,9 +597,9 @@
 
 
 
-<div class="viewcode-block" id="perform_imputation">
-<a class="viewcode-back" href="../../api/COSIE.downstream_analysis.perform_imputation.html#COSIE.downstream_analysis.perform_imputation">[docs]</a>
-<span class="k">def</span> <span class="nf">perform_imputation</span><span class="p">(</span>
+<div class="viewcode-block" id="perform_prediction">
+<a class="viewcode-back" href="../../api/COSIE.downstream_analysis.perform_prediction.html#COSIE.downstream_analysis.perform_prediction">[docs]</a>
+<span class="k">def</span> <span class="nf">perform_prediction</span><span class="p">(</span>
     <span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span><span class="p">,</span>
@@ -613,10 +613,10 @@
     <span class="n">n_trees</span><span class="o">=</span><span class="mi">10</span>    
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Perform KNN-based imputation for a specific modality in a target tissue section.</span>
+<span class="sd">    Perform KNN-based prediction for a specific modality in a target tissue section.</span>
 
-<span class="sd">    The imputed values are computed by identifying the K nearest neighbors in the embedding space</span>
-<span class="sd">    from source sections and averaging their expression values for the specified molecules. If accelerate = True, PCA will be conducted and imputation will be performed based on the PCA embedding instead. </span>
+<span class="sd">    The predicted values are computed by identifying the K nearest neighbors in the embedding space</span>
+<span class="sd">    from source sections and averaging their expression values for the specified molecules. If accelerate = True, PCA will be conducted and preeiction will be performed based on the PCA embedding instead. </span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -627,32 +627,32 @@
 <span class="sd">        A dictionary mapping section names (e.g., `&#39;s1&#39;`, `&#39;s2&#39;`, ...) to 2D NumPy arrays of shape (n_cells, latent_dim), representing cell embeddings for each section.</span>
 <span class="sd">    </span>
 <span class="sd">    target_section : str</span>
-<span class="sd">        The name of the section to impute (e.g., `&#39;s1&#39;`).</span>
+<span class="sd">        The name of the section to predict (e.g., `&#39;s1&#39;`).</span>
 <span class="sd">    </span>
 <span class="sd">    target_modality : str</span>
-<span class="sd">        The modality to impute (e.g., `&#39;RNA&#39;`, `&#39;Protein&#39;`, `&#39;Metabolite&#39;`).</span>
+<span class="sd">        The modality to predict (e.g., `&#39;RNA&#39;`, `&#39;Protein&#39;`, `&#39;Metabolite&#39;`).</span>
 <span class="sd">    </span>
 <span class="sd">    K_num : int, optional</span>
-<span class="sd">        Number of nearest neighbors used for imputation. Default is 50.</span>
+<span class="sd">        Number of nearest neighbors used for prediction. Default is 50.</span>
 <span class="sd">    </span>
 <span class="sd">    source_sections : list of str or None, optional</span>
 <span class="sd">        A list of section names to serve as the source data. If None, all sections with the target modality will be used. Default is None.</span>
 <span class="sd">    </span>
 <span class="sd">    target_molecules : str or list, optional</span>
-<span class="sd">        Features (genes, proteins, metabolites, etc.) to impute:</span>
+<span class="sd">        Features (genes, proteins, metabolites, etc.) to predict:</span>
 <span class="sd">        </span>
-<span class="sd">        - `&#39;All&#39;`: Impute the intersection of all shared features across source sections.  </span>
-<span class="sd">        - list: A specific list of features to impute (e.g., `[&#39;CD4&#39;, &#39;CD68&#39;]`).  </span>
+<span class="sd">        - `&#39;All&#39;`: Predict the intersection of all shared features across source sections.  </span>
+<span class="sd">        - list: A specific list of features to predict (e.g., `[&#39;CD4&#39;, &#39;CD68&#39;]`).  </span>
 <span class="sd">        Default is `&#39;All&#39;`.</span>
 <span class="sd">    </span>
 <span class="sd">    block_size : int or None, optional</span>
-<span class="sd">        If set, perform block-wise imputation across features to reduce memory usage. Each block contains up to `block_size` features. Default is None.</span>
+<span class="sd">        If set, perform block-wise prediction across features to reduce memory usage. Each block contains up to `block_size` features. Default is None.</span>
 <span class="sd">    </span>
 <span class="sd">    metric : str, optional</span>
 <span class="sd">        Distance metric used in approximate nearest neighbor search (via Annoy). Must be one of: {&#39;euclidean&#39;, &#39;manhattan&#39;, &#39;angular&#39;, &#39;hamming&#39;, &#39;dot&#39;}. Default is `&#39;euclidean&#39;`.</span>
 
 <span class="sd">    accelerate : bool, optional</span>
-<span class="sd">        Whether to perform joint PCA dimensionality reduction (to 50 dimensions) on all embeddings before imputation. </span>
+<span class="sd">        Whether to perform joint PCA dimensionality reduction (to 50 dimensions) on all embeddings before prediction. </span>
 <span class="sd">        This can accelerate nearest neighbor search and reduce memory usage. Default is False.</span>
 
 <span class="sd">    </span>
@@ -662,11 +662,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    new_adata : AnnData</span>
-<span class="sd">        A new AnnData object containing the imputed data. Includes:</span>
+<span class="sd">        A new AnnData object containing the predicted data. Includes:</span>
 <span class="sd">        </span>
-<span class="sd">        - `.X`: Imputed expression matrix as a dense NumPy array.  </span>
+<span class="sd">        - `.X`: Predicted expression matrix as a dense NumPy array.  </span>
 <span class="sd">        - `.obs`: Metadata copied from the target section’s reference AnnData.  </span>
-<span class="sd">        - `.var`: Feature names associated with the imputed modality.  </span>
+<span class="sd">        - `.var`: Feature names associated with the predicted modality.  </span>
 <span class="sd">        - `.obsm[&#39;spatial&#39;]`: Copied spatial coordinates (if present).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
@@ -842,7 +842,7 @@
 <span class="sd">        The molecule name to visualize. Must be present in `.var` of both AnnData objects.</span>
 <span class="sd">    </span>
 <span class="sd">    adata1 : AnnData</span>
-<span class="sd">        The first AnnData object, e.g., for imputed data.</span>
+<span class="sd">        The first AnnData object, e.g., for predicted data.</span>
 <span class="sd">    </span>
 <span class="sd">    adata2 : AnnData</span>
 <span class="sd">        The second AnnData object, e.g., for observed data.</span>
@@ -1507,6 +1507,61 @@
         <span class="n">relabeled_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">relabeled_labels</span>
 
     <span class="k">return</span> <span class="n">relabeled_dict</span></div>
+
+
+
+
+<div class="viewcode-block" id="truncate_gene_expression_smartclip">
+<a class="viewcode-back" href="../../api/COSIE.downstream_analysis.truncate_gene_expression_smartclip.html#COSIE.downstream_analysis.truncate_gene_expression_smartclip">[docs]</a>
+<span class="k">def</span> <span class="nf">truncate_gene_expression_smartclip</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Truncate expression data based on non-zero values to reduce the impact of extreme outliers in visualization.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata : AnnData</span>
+<span class="sd">        Input AnnData object.</span>
+<span class="sd">    </span>
+<span class="sd">    gene : str</span>
+<span class="sd">        Gene name (must be in adata.var_names).</span>
+<span class="sd">    </span>
+<span class="sd">    lower : float, optional</span>
+<span class="sd">        Lower percentile to truncate. Default is 0.</span>
+<span class="sd">    </span>
+<span class="sd">    upper : float, optional</span>
+<span class="sd">        Upper percentile to truncate. Default is 99.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    AnnData</span>
+<span class="sd">        New AnnData object with truncated expression values in .X.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[:,</span> <span class="n">gene</span><span class="p">]</span><span class="o">.</span><span class="n">X</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;toarray&quot;</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">nonzero_values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">values</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_nonzero</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero_values</span><span class="p">)</span>
+    <span class="n">num_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">num_nonzero</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">values_clipped</span> <span class="o">=</span> <span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">nonzero_values</span><span class="p">,</span> <span class="n">lower</span><span class="p">)</span> <span class="k">if</span> <span class="n">lower</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">nonzero_values</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+        <span class="n">values_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
+
+    <span class="n">new_adata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">values_clipped</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span>
+        <span class="n">obs</span><span class="o">=</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">var</span><span class="o">=</span><span class="n">adata</span><span class="p">[:,</span> <span class="n">gene</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">obsm</span><span class="o">=</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">new_adata</span></div>
 
 
 

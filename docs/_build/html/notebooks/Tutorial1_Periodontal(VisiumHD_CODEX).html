@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -57,18 +57,15 @@
 <li class="toctree-l3"><a class="reference internal" href="#Specify-the-linkage-indicator">Specify the linkage indicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Define-COSIE-Model-and-Perform-Integration">Define COSIE Model and Perform Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Perform-clustering-and-visualization">Perform clustering and visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-CODEX-data-for-section1">Impute CODEX data for section1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-CODEX-data-for-section1">Predict CODEX data for section1</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial6_Gastric_cancer%28Visium_COMET%29.html">Tutorial 6 - Gastric cancer (Visium + COMET)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html">Tutorial 7 - Lung cancer (Spatial CITE-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial8_Mouse_spleen%28SPOTS%29.html">Tutorial 8 - Mouse spleen (SPOTS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial9_LUAD_TCGA.html">Tutorial 9 - LUAD TCGA integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial10_B_cell_lymphoma%28CosMx_CODEX%29.html">Tutorial 10 - B cell lymphoma (CosMx + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial11_Tonsil%28Spatial_CITE_seq%29.html">Tutorial 11 - Tonsil (Spatial CITE-seq)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
@@ -456,13 +453,13 @@ Perform joint clustering...
 </div>
 </div>
 </section>
-<section id="Impute-CODEX-data-for-section1">
-<h2>Impute CODEX data for section1<a class="headerlink" href="#Impute-CODEX-data-for-section1" title="Link to this heading">¶</a></h2>
+<section id="Predict-CODEX-data-for-section1">
+<h2>Predict CODEX data for section1<a class="headerlink" href="#Predict-CODEX-data-for-section1" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s1&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;Protein&#39;</span><span class="p">,</span>
@@ -485,8 +482,7 @@ Using modality [RNA] in section [s1] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_protein_imputed</span><span class="p">)</span>
-<span class="n">adata2_adt_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_adt</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_protein_predicted</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -494,14 +490,18 @@ Using modality [RNA] in section [s1] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_protein</span> <span class="o">=</span> <span class="s1">&#39;COLA1&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_protein</span> <span class="o">=</span> <span class="s1">&#39;CD68&#39;</span>
+<span class="n">adata_truncate</span> <span class="o">=</span> <span class="n">truncate_gene_expression_smartclip</span><span class="p">(</span><span class="n">adata2_adt</span><span class="p">,</span> <span class="n">chosed_protein</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">99</span><span class="p">)</span>
+<span class="n">adata_truncate_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata_truncate</span><span class="p">)</span>
+
 <span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span>
     <span class="n">chosed_protein</span><span class="p">,</span>
-    <span class="n">adata1_protein_imputed_norm</span><span class="p">,</span>
-    <span class="n">adata2_adt_norm</span><span class="p">,</span>
-    <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section 1 imputed&#39;</span><span class="p">,</span>
-    <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section 2 observed&#39;</span><span class="p">,</span>
+    <span class="n">adata1_protein_predicted_norm</span><span class="p">,</span>
+    <span class="n">adata_truncate_norm</span><span class="p">,</span>
+    <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 predicted&#39;</span><span class="p">,</span>
+    <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed&#39;</span><span class="p">,</span>
     <span class="n">basis</span> <span class="o">=</span> <span class="s1">&#39;spatial&#39;</span><span class="p">,</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;turbo&quot;</span><span class="p">,</span>
     <span class="n">figscale</span> <span class="o">=</span> <span class="mi">120</span><span class="p">,</span>
     <span class="n">dpi</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
 <br/></pre></div>
@@ -515,17 +515,21 @@ Using modality [RNA] in section [s1] as spatial/obs reference
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_protein</span> <span class="o">=</span> <span class="s1">&#39;KRT14&#39;</span>
+<span class="n">adata_truncate</span> <span class="o">=</span> <span class="n">truncate_gene_expression_smartclip</span><span class="p">(</span><span class="n">adata2_adt</span><span class="p">,</span> <span class="n">chosed_protein</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">99</span><span class="p">)</span>
+<span class="n">adata_truncate_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata_truncate</span><span class="p">)</span>
+
 <span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span>
     <span class="n">chosed_protein</span><span class="p">,</span>
-    <span class="n">adata1_protein_imputed_norm</span><span class="p">,</span>
-    <span class="n">adata2_adt_norm</span><span class="p">,</span>
-    <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section 1 imputed&#39;</span><span class="p">,</span>
-    <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section 2 observed&#39;</span><span class="p">,</span>
+    <span class="n">adata1_protein_predicted_norm</span><span class="p">,</span>
+    <span class="n">adata_truncate_norm</span><span class="p">,</span>
+    <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 predicted&#39;</span><span class="p">,</span>
+    <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed&#39;</span><span class="p">,</span>
     <span class="n">basis</span> <span class="o">=</span> <span class="s1">&#39;spatial&#39;</span><span class="p">,</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;turbo&quot;</span><span class="p">,</span>
     <span class="n">figscale</span> <span class="o">=</span> <span class="mi">120</span><span class="p">,</span>
     <span class="n">dpi</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
 <br/></pre></div>
@@ -536,6 +540,34 @@ Using modality [RNA] in section [s1] as spatial/obs reference
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/notebooks_Tutorial1_Periodontal%28VisiumHD_CODEX%29_29_0.png" src="../_images/notebooks_Tutorial1_Periodontal%28VisiumHD_CODEX%29_29_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_protein</span> <span class="o">=</span> <span class="s1">&#39;COLA1&#39;</span>
+<span class="n">adata_truncate</span> <span class="o">=</span> <span class="n">truncate_gene_expression_smartclip</span><span class="p">(</span><span class="n">adata2_adt</span><span class="p">,</span> <span class="n">chosed_protein</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">99</span><span class="p">)</span>
+<span class="n">adata_truncate_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata_truncate</span><span class="p">)</span>
+
+<span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span>
+    <span class="n">chosed_protein</span><span class="p">,</span>
+    <span class="n">adata1_protein_predicted_norm</span><span class="p">,</span>
+    <span class="n">adata_truncate_norm</span><span class="p">,</span>
+    <span class="n">section1_label</span> <span class="o">=</span> <span class="s1">&#39;Section1 predicted&#39;</span><span class="p">,</span>
+    <span class="n">section2_label</span> <span class="o">=</span> <span class="s1">&#39;Section2 observed&#39;</span><span class="p">,</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="s1">&#39;spatial&#39;</span><span class="p">,</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;turbo&quot;</span><span class="p">,</span>
+    <span class="n">figscale</span> <span class="o">=</span> <span class="mi">120</span><span class="p">,</span>
+    <span class="n">dpi</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Tutorial1_Periodontal%28VisiumHD_CODEX%29_30_0.png" src="../_images/notebooks_Tutorial1_Periodontal%28VisiumHD_CODEX%29_30_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">

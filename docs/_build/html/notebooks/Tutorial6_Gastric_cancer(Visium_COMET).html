@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -22,7 +22,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Tutorial 7 - Lung cancer (Spatial CITE-seq)" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html" />
+    <link rel="next" title="Tutorial 8 - Mouse spleen (SPOTS)" href="Tutorial8_Mouse_spleen%28SPOTS%29.html" />
     <link rel="prev" title="Tutorial 5 - Mouse embryo (Spatial Mux-seq)" href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html" /> 
 </head>
 
@@ -53,7 +53,6 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial_of_image_feature_extraction.html">Tutorial - Image feature extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial1_Periodontal%28VisiumHD_CODEX%29.html">Tutorial 1 - Periodontal data (Visium HD + CODEX)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial2_Atherosclerosis%28Xenium_CODEX%29.html">Tutorial 2 - Atherosclerosis (Xenium + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial4_Mouse_hippocampus%28Spatial_Visium_MALDI%29.html">Tutorial 4 - Mouse hippocampus (Spatial Visium-MALDI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html">Tutorial 5 - Mouse embryo (Spatial Mux-seq)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 6 - Gastric cancer (Visium + COMET)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Load-data">Load data</a></li>
@@ -61,15 +60,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#Specify-the-linkage-indicator">Specify the linkage indicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Define-COSIE-Model-and-Perform-Integration">Define COSIE Model and Perform Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Perform-clustering-and-visualization">Perform clustering and visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-protein-for-Section1">Impute protein for Section1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Impute-RNA-for-Section2">Impute RNA for Section2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-protein-for-Section1">Predict protein for Section1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Predict-RNA-for-Section2">Predict RNA for Section2</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html">Tutorial 7 - Lung cancer (Spatial CITE-seq)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial8_Mouse_spleen%28SPOTS%29.html">Tutorial 8 - Mouse spleen (SPOTS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial9_LUAD_TCGA.html">Tutorial 9 - LUAD TCGA integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial10_B_cell_lymphoma%28CosMx_CODEX%29.html">Tutorial 10 - B cell lymphoma (CosMx + CODEX)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial11_Tonsil%28Spatial_CITE_seq%29.html">Tutorial 11 - Tonsil (Spatial CITE-seq)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
@@ -144,10 +141,9 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_rna</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;PCA-NCI-E44&#39;</span><span class="p">,</span> <span class="s1">&#39;adata_PCA-NCI-E44_rna.h5ad&#39;</span><span class="p">))</span>
-<span class="n">adata2_rna</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;PCA-NCI-E29&#39;</span><span class="p">,</span> <span class="s1">&#39;adata_PCA-NCI-E29_rna.h5ad&#39;</span><span class="p">))</span>
 <span class="n">adata2_adt</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;PCA-NCI-E29&#39;</span><span class="p">,</span> <span class="s1">&#39;adata_comet_normalized.h5ad&#39;</span><span class="p">))</span>
 
-<span class="n">adata1_rna</span><span class="p">,</span> <span class="n">adata2_rna</span><span class="p">,</span> <span class="n">adata2_adt</span>
+<span class="n">adata1_rna</span><span class="p">,</span> <span class="n">adata2_adt</span>
 </pre></div>
 </div>
 </div>
@@ -159,10 +155,8 @@
 <div class="highlight"><pre>
 (AnnData object with n_obs × n_vars = 825621 × 3000
      obsm: &#39;UNI_feature&#39;, &#39;pxl_loc&#39;, &#39;spatial&#39;,
- AnnData object with n_obs × n_vars = 741804 × 3000
-     obsm: &#39;UNI_feature&#39;, &#39;pxl_loc&#39;, &#39;spatial&#39;,
  AnnData object with n_obs × n_vars = 741804 × 19
-     obsm: &#39;spatial&#39;, &#39;transformed_pxl_loc_in_dapi&#39;)
+     obsm: &#39;UNI_feature&#39;, &#39;spatial&#39;, &#39;transformed_pxl_loc_in_dapi&#39;)
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -170,7 +164,6 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_rna</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
-<span class="n">adata2_rna</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
 <span class="n">adata2_adt</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -180,9 +173,9 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_he</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">adata1_rna</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;UNI_feature&#39;</span><span class="p">])</span>
-<span class="n">adata2_he</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">adata2_rna</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;UNI_feature&#39;</span><span class="p">])</span>
+<span class="n">adata2_he</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">adata2_adt</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;UNI_feature&#39;</span><span class="p">])</span>
 <span class="n">adata1_he</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata1_rna</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">adata2_he</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata2_rna</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">adata2_he</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata2_adt</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">adata1_he</span><span class="p">,</span> <span class="n">adata2_he</span>
 </pre></div>
 </div>
@@ -474,13 +467,13 @@ Perform joint clustering...
 </div>
 </div>
 </section>
-<section id="Impute-protein-for-Section1">
-<h2>Impute protein for Section1<a class="headerlink" href="#Impute-protein-for-Section1" title="Link to this heading">¶</a></h2>
+<section id="Predict-protein-for-Section1">
+<h2>Predict protein for Section1<a class="headerlink" href="#Predict-protein-for-Section1" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s1&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;Protein&#39;</span><span class="p">,</span>
@@ -503,7 +496,7 @@ Using modality [HE] in section [s1] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted</span>
 </pre></div>
 </div>
 </div>
@@ -521,7 +514,7 @@ AnnData object with n_obs × n_vars = 825621 × 19
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed_norm</span> <span class="o">=</span> <span class="n">adata1_protein_imputed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted_norm</span> <span class="o">=</span> <span class="n">adata1_protein_predicted</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">adata2_adt_norm</span> <span class="o">=</span> <span class="n">adata2_adt</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -530,7 +523,7 @@ AnnData object with n_obs × n_vars = 825621 × 19
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed_norm</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsinh</span><span class="p">(</span><span class="n">adata1_protein_imputed_norm</span><span class="o">.</span><span class="n">X</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)</span>   <span class="c1"># For COMET data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted_norm</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsinh</span><span class="p">(</span><span class="n">adata1_protein_predicted_norm</span><span class="o">.</span><span class="n">X</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)</span>   <span class="c1"># For COMET data</span>
 <span class="n">adata2_adt_norm</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsinh</span><span class="p">(</span><span class="n">adata2_adt_norm</span><span class="o">.</span><span class="n">X</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)</span>   <span class="c1"># For COMET data</span>
 </pre></div>
 </div>
@@ -539,7 +532,7 @@ AnnData object with n_obs × n_vars = 825621 × 19
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_protein_imputed_norm</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata1_protein_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_protein_predicted_norm</span><span class="p">)</span>
 <span class="n">adata2_adt_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_adt_norm</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -550,10 +543,10 @@ AnnData object with n_obs × n_vars = 825621 × 19
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_protein</span> <span class="o">=</span> <span class="s1">&#39;Ecadherin&#39;</span>
 <span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_protein</span><span class="p">,</span>
-                       <span class="n">adata1_protein_imputed_norm</span><span class="p">,</span>
+                       <span class="n">adata1_protein_predicted_norm</span><span class="p">,</span>
                        <span class="n">adata2_adt_norm</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s1 Imputed&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s2 Observed&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;Section1 predicted&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;Section2 observed&#39;</span><span class="p">,</span>
                         <span class="n">figscale</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,)</span>
 </pre></div>
 </div>
@@ -574,13 +567,13 @@ AnnData object with n_obs × n_vars = 825621 × 19
 </div>
 </div>
 </section>
-<section id="Impute-RNA-for-Section2">
-<h2>Impute RNA for Section2<a class="headerlink" href="#Impute-RNA-for-Section2" title="Link to this heading">¶</a></h2>
+<section id="Predict-RNA-for-Section2">
+<h2>Predict RNA for Section2<a class="headerlink" href="#Predict-RNA-for-Section2" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_rna_imputed</span> <span class="o">=</span> <span class="n">perform_imputation</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_rna_predicted</span> <span class="o">=</span> <span class="n">perform_prediction</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span>
     <span class="n">final_embeddings</span><span class="p">,</span>
     <span class="n">target_section</span> <span class="o">=</span> <span class="s1">&#39;s2&#39;</span><span class="p">,</span>
     <span class="n">target_modality</span> <span class="o">=</span> <span class="s1">&#39;RNA&#39;</span><span class="p">,</span>
@@ -603,8 +596,8 @@ Using modality [HE] in section [s2] as spatial/obs reference
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_rna_imputed_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_rna_imputed</span><span class="p">)</span>
-<span class="n">adata2_rna_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_rna</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata2_rna_predicted_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata2_rna_predicted</span><span class="p">)</span>
+<span class="n">adata1_rna_norm</span> <span class="o">=</span> <span class="n">create_normalized_adata</span><span class="p">(</span><span class="n">adata1_rna</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -614,10 +607,10 @@ Using modality [HE] in section [s2] as spatial/obs reference
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;GKN1&#39;</span>
 <span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
-                       <span class="n">adata2_rna_imputed_norm</span><span class="p">,</span>
-                       <span class="n">adata2_rna_norm</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s2 Imputed&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Section s2 Observed&#39;</span><span class="p">,</span>
+                       <span class="n">adata2_rna_predicted_norm</span><span class="p">,</span>
+                       <span class="n">adata1_rna_norm</span><span class="p">,</span>
+                       <span class="s1">&#39;Section s2 predicted&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;Section s1 observed&#39;</span><span class="p">,</span>
                         <span class="n">figscale</span> <span class="o">=</span> <span class="mi">150</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -629,12 +622,25 @@ Using modality [HE] in section [s2] as spatial/obs reference
 <img alt="../_images/notebooks_Tutorial6_Gastric_cancer%28Visium_COMET%29_36_0.png" src="../_images/notebooks_Tutorial6_Gastric_cancer%28Visium_COMET%29_36_0.png" />
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosed_gene</span> <span class="o">=</span> <span class="s1">&#39;DES&#39;</span>
+<span class="n">plot_marker_comparison_superpixel</span><span class="p">(</span><span class="n">chosed_gene</span><span class="p">,</span>
+                       <span class="n">adata2_rna_predicted_norm</span><span class="p">,</span>
+                       <span class="n">adata1_rna_norm</span><span class="p">,</span>
+                       <span class="s1">&#39;Section s2 predicted&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;Section s1 observed&#39;</span><span class="p">,</span>
+                        <span class="n">figscale</span> <span class="o">=</span> <span class="mi">150</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Tutorial6_Gastric_cancer%28Visium_COMET%29_37_0.png" src="../_images/notebooks_Tutorial6_Gastric_cancer%28Visium_COMET%29_37_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -653,7 +659,7 @@ Using modality [HE] in section [s2] as spatial/obs reference
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Tutorial5_Mouse_embryo%28Spatial_Mux_seq%29.html" class="btn btn-neutral float-left" title="Tutorial 5 - Mouse embryo (Spatial Mux-seq)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Tutorial7_Lung_cancer%28Spatial_CITE_seq%29.html" class="btn btn-neutral float-right" title="Tutorial 7 - Lung cancer (Spatial CITE-seq)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Tutorial8_Mouse_spleen%28SPOTS%29.html" class="btn btn-neutral float-right" title="Tutorial 8 - Mouse spleen (SPOTS)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -9,7 +9,7 @@
   <title>COSIE.downstream_analysis &mdash; COSIE 1.0, 2025-04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=20dd2a28" />
+      <link rel="stylesheet" type="text/css" href="../_static/readthedocs-custom.css?v=1524ae53" />
 
   
       <script src="../_static/documentation_options.js?v=59fcc1ed"></script>
@@ -58,12 +58,13 @@
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.create_normalized_adata.html">COSIE.downstream_analysis.create_normalized_adata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.highlight_joint_clusters_all_sections.html">COSIE.downstream_analysis.highlight_joint_clusters_all_sections</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html">COSIE.downstream_analysis.merge_clusters_to_new_ids</a></li>
-<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.perform_imputation.html">COSIE.downstream_analysis.perform_imputation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.perform_prediction.html">COSIE.downstream_analysis.perform_prediction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_histology_clusters.html">COSIE.downstream_analysis.plot_histology_clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison.html">COSIE.downstream_analysis.plot_marker_comparison</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.plot_marker_comparison_superpixel.html">COSIE.downstream_analysis.plot_marker_comparison_superpixel</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.prepare_image.html">COSIE.downstream_analysis.prepare_image</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.relabel_clusters_sequentially.html">COSIE.downstream_analysis.relabel_clusters_sequentially</a></li>
+<li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.truncate_gene_expression_smartclip.html">COSIE.downstream_analysis.truncate_gene_expression_smartclip</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html">COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram</a></li>
 <li class="toctree-l4"><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html">COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram</a></li>
 </ul>
@@ -125,8 +126,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.merge_clusters_to_new_ids.html#COSIE.downstream_analysis.merge_clusters_to_new_ids" title="COSIE.downstream_analysis.merge_clusters_to_new_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_clusters_to_new_ids</span></code></a></p></td>
 <td><p>Merge specified cluster IDs into new classes with IDs starting from current max + 1.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.perform_imputation.html#COSIE.downstream_analysis.perform_imputation" title="COSIE.downstream_analysis.perform_imputation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_imputation</span></code></a></p></td>
-<td><p>Perform KNN-based imputation for a specific modality in a target tissue section.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.perform_prediction.html#COSIE.downstream_analysis.perform_prediction" title="COSIE.downstream_analysis.perform_prediction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_prediction</span></code></a></p></td>
+<td><p>Perform KNN-based prediction for a specific modality in a target tissue section.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.plot_histology_clusters.html#COSIE.downstream_analysis.plot_histology_clusters" title="COSIE.downstream_analysis.plot_histology_clusters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_histology_clusters</span></code></a></p></td>
 <td><p>Visualize cluster maps from 2D cluster masks.</p></td>
@@ -143,10 +144,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.relabel_clusters_sequentially.html#COSIE.downstream_analysis.relabel_clusters_sequentially" title="COSIE.downstream_analysis.relabel_clusters_sequentially"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relabel_clusters_sequentially</span></code></a></p></td>
 <td><p>Relabel all cluster IDs across sections to contiguous integers starting from 0.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html#COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram" title="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_global_cluster_centroid_dendrogram</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.truncate_gene_expression_smartclip.html#COSIE.downstream_analysis.truncate_gene_expression_smartclip" title="COSIE.downstream_analysis.truncate_gene_expression_smartclip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncate_gene_expression_smartclip</span></code></a></p></td>
+<td><p>Truncate expression data based on non-zero values to reduce the impact of extreme outliers in visualization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram.html#COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram" title="COSIE.downstream_analysis.visualize_global_cluster_centroid_dendrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_global_cluster_centroid_dendrogram</span></code></a></p></td>
 <td><p>Visualize dendrogram for clusters shared across sections.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html#COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram" title="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_section_cluster_centroids_dendrogram</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram.html#COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram" title="COSIE.downstream_analysis.visualize_section_cluster_centroids_dendrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize_section_cluster_centroids_dendrogram</span></code></a></p></td>
 <td><p>Visualize hierarchical clustering dendrogram within a single section.</p></td>
 </tr>
 </tbody>

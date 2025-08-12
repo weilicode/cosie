@@ -33,3 +33,6 @@
     max-width: 120px;   /* adjust width */
     height: auto;       /* keep aspect ratio */
 }
+
+/* add some breathing room under the framework image */
+.spaced-img { margin-bottom: 1.5rem; }  /* tweak to taste */

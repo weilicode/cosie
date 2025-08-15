@@ -583,6 +583,7 @@ def perform_prediction(
         - `.var`: Feature names associated with the predicted modality.  
         - `.obsm['spatial']`: Copied spatial coordinates (if present).
     """
+    final_embeddings = dict(sorted(final_embeddings.items(), key=lambda x: int(x[0][1:])))
     from sklearn.decomposition import PCA
     section_names = list(final_embeddings.keys())
 

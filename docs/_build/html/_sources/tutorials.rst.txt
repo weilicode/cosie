@@ -1,6 +1,9 @@
 Tutorials
 =========
 
+Here are the tutorials to reproduce all the results in the COSIE paper. 
+If you have histology image modalities, you can follow image feature extraction tutorial first. 
+You can then use the following tutorials to apply COSIE to your data.
 
 .. toctree::
    :caption: Tutorials

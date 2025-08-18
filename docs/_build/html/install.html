@@ -45,13 +45,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#create-and-activate-the-environment">Create and activate the environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#clone-the-cosie-repository">Clone the COSIE repository</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#enable-jupyter-notebook-support">Enable Jupyter Notebook support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
@@ -83,41 +78,37 @@
   <section id="installation-guide">
 <h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h1>
 <p>This guide will help you install and set up the COSIE package.</p>
-<p>We recommend creating and activating a dedicated conda environment before installation. If you haven’t installed conda yet, we suggest using <a class="reference external" href="https://www.anaconda.com/docs/getting-started/miniconda/main">Miniconda</a>.</p>
-<section id="create-and-activate-the-environment">
-<h2>Create and activate the environment<a class="headerlink" href="#create-and-activate-the-environment" title="Link to this heading">¶</a></h2>
+<p>For convenience, we recommend creating and activating a dedicated conda environment before installing COSIE.
+If you haven’t installed conda yet, we suggest using <a class="reference external" href="https://www.anaconda.com/docs/getting-started/miniconda/main">Miniconda</a>, a lightweight distribution of conda.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>cosie_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9.19
 conda<span class="w"> </span>activate<span class="w"> </span>cosie_env
 </pre></div>
 </div>
-</section>
-<section id="clone-the-cosie-repository">
-<h2>Clone the COSIE repository<a class="headerlink" href="#clone-the-cosie-repository" title="Link to this heading">¶</a></h2>
+<p>The COSIE package can be downloaded by:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/weilicode/cosie.git
 <span class="nb">cd</span><span class="w"> </span>cosie
 </pre></div>
 </div>
-</section>
-<section id="enable-jupyter-notebook-support">
-<h2>Enable Jupyter Notebook support<a class="headerlink" href="#enable-jupyter-notebook-support" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">cosie_env</span></code> environment can be used in Jupyter Notebook by:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ipykernel
 python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--name<span class="o">=</span>cosie_env
 </pre></div>
 </div>
 </section>
 <section id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
-<p>COSIE is a graph deep learning model built upon:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/">torch==2.4.0</a></p></li>
-<li><p><a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/">torch_geometric==2.5.3</a></p></li>
-</ul>
-<p>If you plan to use a GPU, ensure that your PyTorch and PyTorch Geometric versions match your local CUDA setup.</p>
-<p>All additional dependencies are listed in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> and can be installed with:</p>
+<h1>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h1>
+<p>COSIE is a graph deep learning model built upon <a class="reference external" href="https://pytorch.org/">torch-2.4.0</a> and
+<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/">torch_geometric-2.5.3</a>.</p>
+<p>Using GPU acceleration can significantly speed up the training process. If you plan to use a GPU, please make sure that PyTorch and PyTorch Geometric are installed with versions that are compatible with your local CUDA version. For example, if you are using CUDA 12.1, you can install the required packages as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">torch</span><span class="o">==</span><span class="m">2</span>.4.0<span class="w"> </span><span class="nv">torchvision</span><span class="o">==</span><span class="m">0</span>.19.0<span class="w"> </span><span class="nv">torchaudio</span><span class="o">==</span><span class="m">2</span>.4.0<span class="w"> </span>--index-url<span class="w"> </span>https://download.pytorch.org/whl/cu121
+pip<span class="w"> </span>install<span class="w"> </span>pyg_lib<span class="w"> </span>torch_scatter<span class="w"> </span>torch_sparse<span class="w"> </span>torch_cluster<span class="w"> </span>torch_spline_conv<span class="w"> </span>-f<span class="w"> </span>https://data.pyg.org/whl/torch-2.4.0+cu121.html
+pip<span class="w"> </span>install<span class="w"> </span><span class="nv">torch_geometric</span><span class="o">==</span><span class="m">2</span>.5.3
+</pre></div>
+</div>
+<p>All other required packages are listed in <a class="reference external" href="requirements.txt">requirements.txt</a>. You can install them by running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
-</section>
 </section>
 
 

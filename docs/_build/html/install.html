@@ -45,8 +45,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
@@ -78,6 +81,8 @@
   <section id="installation-guide">
 <h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h1>
 <p>This guide will help you install and set up the COSIE package.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <p>For convenience, we recommend creating and activating a dedicated conda environment before installing COSIE.
 If you haven’t installed conda yet, we suggest using <a class="reference external" href="https://www.anaconda.com/docs/getting-started/miniconda/main">Miniconda</a>, a lightweight distribution of conda.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>cosie_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9.19
@@ -96,7 +101,7 @@ python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"
 </div>
 </section>
 <section id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h1>
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
 <p>COSIE is a graph deep learning model built upon <a class="reference external" href="https://pytorch.org/">torch-2.4.0</a> and
 <a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/">torch_geometric-2.5.3</a>.</p>
 <p>Using GPU acceleration can significantly speed up the training process. If you plan to use a GPU, please make sure that PyTorch and PyTorch Geometric are installed with versions that are compatible with your local CUDA version. For example, if you are using CUDA 12.1, you can install the required packages as follows:</p>
@@ -105,10 +110,11 @@ pip<span class="w"> </span>install<span class="w"> </span>pyg_lib<span class="w"
 pip<span class="w"> </span>install<span class="w"> </span><span class="nv">torch_geometric</span><span class="o">==</span><span class="m">2</span>.5.3
 </pre></div>
 </div>
-<p>All other required packages are listed in <a class="reference external" href="requirements.txt">requirements.txt</a>. You can install them by running:</p>
+<p>All other required packages are listed in requirements.txt. You can install them by running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
+</section>
 </section>
 
 

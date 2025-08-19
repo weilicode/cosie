@@ -19,7 +19,7 @@ COSIE enables within- and **C**r**O**ss-subject **S**patial multimodal **I**nteg
 
 
 ## Usage
-For detailed usage instructions and various applications of COSIE, please refer to the [COSIE Documentation](#).
+For detailed usage instructions and various applications of COSIE, please refer to the [COSIE Documentation](https://cosie.readthedocs.io/en/latest/).
 
 Example notebooks with data are provided in the [Examples](./Examples/).
 

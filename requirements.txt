@@ -15,5 +15,3 @@ timm==1.0.9
 tqdm==4.66.5
 harmony-py==0.5.0
 harmonypy==0.0.10
-torch_geometric==2.5.3
-

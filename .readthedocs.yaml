@@ -11,7 +11,7 @@ sphinx:
 python:
   install:
     - requirements: docs/requirements.txt   # sphinx + doc tools
-    - requirements: cosie/extra_requirements.txt   # <- your special file
+    - requirements: requirements.txt   # <- your special file
     - method: pip
       path: .   # install your repo (so autodoc finds cosie)
 

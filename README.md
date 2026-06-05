@@ -70,8 +70,21 @@ All other required packages are listed in [requirements.txt](requirements.txt). 
 pip install -r requirements.txt
 ```
 
+## Note
 
 
+- SpaMTP and iStar are optional preprocessing tools and are not components of the COSIE framework itself. SpaMTP was used only for gene-metabolite alignment in the mouse brain dataset, whereas iStar was used only for spatial resolution enhancement. Users can directly input their own data into COSIE without relying on either tool.
+
+- COSIE supports heterogeneous modality combinations through a unified interface. Users only need to define the available modalities for each section in a simple dictionary, and COSIE will automatically perform the required preprocessing. For example:
+
+  ```
+  data_dict = {
+      "RNA": [adata1_rna, adata2_rna],
+      "HE": [adata1_he, None],
+      "Protein": [None, adata2_adt],
+  }
+  ```
+  In this example, Section 1 contains RNA and H&E data, whereas Section 2 contains RNA and protein data. COSIE automatically identifies the available modalities and performs the required preprocessing.
 ## Questions
 If you have any questions about COSIE, feel free to open an [issue](https://github.com/weilicode/cosie/issues) or contact us via email(Wei.Li@PennMedicine.upenn.edu).
 

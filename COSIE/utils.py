@@ -14,11 +14,8 @@ import torch
 from torch_geometric.utils import negative_sampling
 import torch.nn.functional as F
 from scipy.spatial import distance_matrix
-
 from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import kneighbors_graph 
-
-
 from annoy import AnnoyIndex
 import hnswlib
 

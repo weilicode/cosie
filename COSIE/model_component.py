@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 
 
+
 class GraphAutoencoder(nn.Module):
 
     """

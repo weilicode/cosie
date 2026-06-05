@@ -2,7 +2,6 @@ import sys
 import torch
 import torch.nn.functional as F
 
-
 def compute_joint(view1, view2):
 
     """

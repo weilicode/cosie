@@ -7,8 +7,6 @@ import scipy.sparse as sp
 import pandas as pd
 import scanpy as sc
 from pathlib import Path
-
-
 from .utils import nn_approx
 
 def perform_strong_linkage_knn(data1, data2):

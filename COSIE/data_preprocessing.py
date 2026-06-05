@@ -8,7 +8,6 @@ import torch
 from collections import defaultdict
 
 
-
 def preprocess_adata(adata_raw, modality, hvg_num=3000, n_comps=50, target_sum=None):
     """
     Preprocess an AnnData object based on the specified modality. The pipeline includes highly variable feature selection, normalization, log-transformation, scaling, and PCA.

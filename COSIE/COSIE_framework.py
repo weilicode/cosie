@@ -17,8 +17,6 @@ from tqdm import tqdm
 
 
 
-
-
 class COSIE_model(nn.Module):
     """
     The core model class of the COSIE framework, designed for spatial multimodal integration, imputation, and enhancement across multiple tissue sections. This class defines the model structure, and handles both training and inference in full-graph or subgraph settings.

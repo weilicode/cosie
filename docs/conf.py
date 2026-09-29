@@ -17,7 +17,7 @@ import sys
 sys.path.append("~/03_integration/tutorial/Sphinx-Autosummary-Recursion")
 sys.path.insert(0, os.path.abspath('..'))  # Source code dir relative to this file
 
-import COSIE
+# import COSIE
 # -- Project information -----------------------------------------------------
 
 project = 'COSIE'
@@ -67,6 +67,9 @@ templates_path = ['_templates']
     # 'tensorflow',
     # 'tensorflow_probability',
 #]
+autodoc_mock_imports = [
+    'torch_geometric',
+]
 # To exclude a class, function, method or attribute, use autodoc-skip-member. (Note this can also
 # be used in reverse, ie. to re-include a particular member that has been excluded.)
 # 'Private' and 'special' members (_ and __) are excluded using the Jinja2 templates; from the main

@@ -16,7 +16,6 @@ from sklearn.preprocessing import normalize
 
 import matplotlib as mpl
 import scanpy as sc
-from matplotlib.cm import get_cmap
 from matplotlib import patches
 from pandas.api.types import CategoricalDtype
 from matplotlib.colors import to_rgb

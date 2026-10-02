@@ -33,7 +33,7 @@ def get_default_config():
 
             * gamma (float): Weight for entropy regularization in contrastive loss.
 
-            * lambda1 (float): Weight for contrastive loss.
+            * lambda1 (float): Weight for reconstruction loss.
 
             * lambda2 (float): Weight for prediction loss.
 
